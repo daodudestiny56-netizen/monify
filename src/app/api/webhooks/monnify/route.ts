@@ -89,6 +89,12 @@ export async function POST(req: Request) {
       transactionRef: transactionReference || `monnify_${Date.now()}`,
     });
 
+    if (!result.success) {
+      return NextResponse.json({
+        error: result.error || "Failed to confirm payment"
+      }, { status: 400 });
+    }
+
     console.log(`Payment confirmed via webhook: Circle ${circleId}, Member ${memberId}, Cycle ${circle.currentCycleNumber}`);
 
     return NextResponse.json({

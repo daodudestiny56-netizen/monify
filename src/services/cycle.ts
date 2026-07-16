@@ -28,6 +28,20 @@ export async function confirmContributionPayment(params: {
     });
 
     if (!contribution) {
+      // Check if circle has not started yet (members count < expected member count)
+      const circle = await tx.circle.findUnique({
+        where: { id: circleId },
+        include: { members: true }
+      });
+      
+      if (circle && circle.members.length < circle.memberCount) {
+        return {
+          success: false,
+          error: `Circle is waiting for more members to join (${circle.members.length}/${circle.memberCount}). Cycle 1 has not started yet.`,
+          alreadyProcessed: false,
+        };
+      }
+
       throw new Error(`Contribution not found for member ${memberId} in cycle ${cycleNumber}`);
     }
 
