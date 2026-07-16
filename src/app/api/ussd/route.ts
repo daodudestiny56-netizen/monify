@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { comparePin } from "@/lib/auth";
 import { createReservedAccount } from "@/services/monify";
 
 // Helper to normalize Nigerian phone numbers to match database (e.g. +234803... or 803... to 0803...)
 function normalizePhone(phone: string): string {
-  let cleaned = phone.trim().replace(/\D/g, "");
+  const cleaned = phone.trim().replace(/\D/g, "");
   // If starts with 234, replace with 0
   if (cleaned.startsWith("234") && cleaned.length > 10) {
     return "0" + cleaned.slice(3);
@@ -32,21 +31,18 @@ export async function POST(req: Request) {
     // Africa's Talking POSTs as x-www-form-urlencoded
     const contentType = req.headers.get("content-type") || "";
     let sessionId = "";
-    let serviceCode = "";
     let phoneNumber = "";
     let text = "";
 
     if (contentType.includes("application/x-www-form-urlencoded")) {
       const formData = await req.formData();
       sessionId = formData.get("sessionId")?.toString() || "";
-      serviceCode = formData.get("serviceCode")?.toString() || "";
       phoneNumber = formData.get("phoneNumber")?.toString() || "";
       text = formData.get("text")?.toString() || "";
     } else {
       // Fallback for JSON requests (like our simulator)
       const body = await req.json();
       sessionId = body.sessionId || "";
-      serviceCode = body.serviceCode || "";
       phoneNumber = body.phoneNumber || "";
       text = body.text || "";
     }
