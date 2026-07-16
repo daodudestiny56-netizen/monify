@@ -1,26 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF8F5; /* Warm Linen */
+  --foreground: #1C1E21; /* Charcoal */
+  
+  --naira-green: #0D5C3A;
+  --naira-green-light: #E7F3EC;
+  --naira-gold: #E5A93C;
+  --naira-gold-light: #FCF4E7;
+  --terracotta: #B24C24;
+  --terracotta-light: #FDF1ED;
+  --warm-linen: #FAF8F5;
+  --charcoal: #1C1E21;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  
+  --color-naira-green: var(--naira-green);
+  --color-naira-green-light: var(--naira-green-light);
+  --color-naira-gold: var(--naira-gold);
+  --color-naira-gold-light: var(--naira-gold-light);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-light: var(--terracotta-light);
+  --color-warm-linen: var(--warm-linen);
+  --color-charcoal: var(--charcoal);
+  
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Outfit", sans-serif;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Outfit", sans-serif;
+}
+
+/* Glassmorphism card utility */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-card-dark {
+  background: rgba(28, 30, 33, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(28, 30, 33, 0.05);
+}
+
+/* Naira green focus outline */
+.focus-ring {
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+.focus-ring:focus-visible {
+  ring: 2px;
+  ring-color: var(--naira-green);
+  ring-offset: 2px;
+}
+
+/* Subtle page backdrop shapes */
+.bg-shape-green {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(13, 92, 58, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(40px);
+  z-index: -10;
+}
+
+.bg-shape-gold {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(229, 169, 60, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(40px);
+  z-index: -10;
+}
+
+.bg-shape-terracotta {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(178, 76, 36, 0.04) 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(40px);
+  z-index: -10;
+}
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Circular payout wheel rotational spin on change */
+.wheel-rotate-transition {
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

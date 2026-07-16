@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                      String         @id @default(uuid())
+  name                    String
+  phone                   String         @unique
+  email                   String?        @unique
+  pinHash                 String
+  payoutBankAccountNumber String?        // Destination bank account for cycle payouts
+  payoutBankCode          String?        // Destination bank code
+  payoutBankName          String?        // Destination bank name
+  createdAt               DateTime       @default(now())
+  circleMembers           CircleMember[]
+}
+
+model Circle {
+  id                 String         @id @default(uuid())
+  name               String
+  adminUserId        String
+  contributionAmount Float
+  frequency          String         // "WEEKLY" | "MONTHLY"
+  memberCount        Int
+  payoutOrder        Json           // Array of user IDs/Member IDs representing rotation
+  payoutOrderType    String         @default("FIXED") // "FIXED" or "RANDOM"
+  currentCycleNumber Int            @default(1)
+  currentRecipientId String?        // Member ID of current recipient
+  status             String         @default("ACTIVE") // "ACTIVE" | "COMPLETED"
+  inviteCode         String         @unique
+  members            CircleMember[]
+  contributions      Contribution[]
+  payouts            Payout[]
+  createdAt          DateTime       @default(now())
+}
+
+model CircleMember {
+  id                           String         @id @default(uuid())
+  circleId                     String
+  userId                       String
+  monnifyReservedAccountNumber String?
+  monnifyBankName              String?
+  monnifyBankCode              String?
+  joinDate                     DateTime       @default(now())
+  payoutPosition               Int            // 0-indexed position in rotation
+  circle                       Circle         @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user                         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contributions                Contribution[]
+  payouts                      Payout[]
+
+  @@unique([circleId, userId])
+  @@unique([circleId, payoutPosition])
+}
+
+model Contribution {
+  id                    String       @id @default(uuid())
+  circleId              String
+  memberId              String
+  cycleNumber           Int
+  amount                Float
+  status                String       @default("PENDING") // "PENDING" | "PAID"
+  monnifyTransactionRef String?      @unique
+  paidAt                DateTime?
+  circle                Circle       @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  member                CircleMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, memberId, cycleNumber])
+}
+
+model Payout {
+  id                    String       @id @default(uuid())
+  circleId              String
+  cycleNumber           Int
+  recipientMemberId     String
+  amount                Float
+  monnifyDisbursementRef String?     @unique
+  status                String       @default("PENDING") // "PENDING" | "PAID" | "FAILED"
+  paidAt                DateTime?
+  circle                Circle       @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  recipient             CircleMember @relation(fields: [recipientMemberId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, cycleNumber])
+}
