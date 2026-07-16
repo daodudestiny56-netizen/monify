@@ -121,16 +121,21 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="flex-grow flex flex-col relative overflow-hidden bg-warm-linen">
-      {/* Background Shapes */}
-      <div className="bg-shape-green top-[-100px] left-[-150px]"></div>
-      <div className="bg-shape-gold bottom-[-50px] right-[-100px]"></div>
-      <div className="bg-shape-terracotta top-[40%] left-[60%]"></div>
+    <div className="flex-grow flex flex-col relative overflow-hidden bg-warm-linen min-h-screen">
+      {/* Ambient Drifting Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
+        <div className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-terracotta/5 blur-[130px] animate-blob-3" />
+      </div>
 
-      {/* Header */}
-      <header className="max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between z-10">
+      {/* Grain Texture Overlay */}
+      <div className="grain-overlay" />
+
+      {/* Floating Glass Header */}
+      <header className="sticky top-4 max-w-7xl mx-auto w-[calc(100%-2rem)] px-6 py-4 flex items-center justify-between z-50 glass-card rounded-2xl my-4">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/20">
+          <div className="w-10 h-10 rounded-xl bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/20 transition-transform duration-350 hover:scale-105">
             <span className="font-display font-extrabold text-xl tracking-tight">₦</span>
           </div>
           <span className="font-display font-bold text-xl tracking-tight text-charcoal">Ajo<span className="text-naira-green">Circles</span></span>
@@ -140,7 +145,7 @@ export default function LandingPage() {
           {user ? (
             <button
               onClick={() => router.push("/dashboard")}
-              className="px-5 py-2.5 bg-naira-green text-white font-semibold rounded-xl hover:bg-naira-green/90 transition shadow-md shadow-naira-green/15 flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 bg-naira-green text-white font-semibold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-md shadow-naira-green/15 flex items-center gap-2 cursor-pointer"
             >
               Go to Dashboard <ArrowRight size={16} />
             </button>
@@ -148,13 +153,13 @@ export default function LandingPage() {
             <>
               <button
                 onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
-                className="px-4 py-2 text-charcoal font-semibold hover:text-naira-green transition cursor-pointer"
+                className="px-4 py-2 text-charcoal font-semibold hover:text-naira-green transition duration-300 cursor-pointer"
               >
                 Sign In
               </button>
               <button
                 onClick={() => setAuthModal({ isOpen: true, mode: "register" })}
-                className="px-5 py-2.5 bg-naira-green text-white font-semibold rounded-xl hover:bg-naira-green/90 transition shadow-md shadow-naira-green/15 cursor-pointer"
+                className="px-5 py-2.5 bg-naira-green text-white font-semibold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-md shadow-naira-green/15 cursor-pointer"
               >
                 Register
               </button>
@@ -165,25 +170,25 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto w-full px-6 py-12 lg:py-20 flex-grow flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
-        <div className="flex-1 max-w-xl text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-naira-green-light text-naira-green font-display font-semibold text-sm mb-6">
+        <div className="flex-grow flex-1 max-w-xl text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-naira-green-light/80 text-naira-green font-display font-semibold text-sm mb-6 border border-naira-green/10 animate-fade-in-up shadow-sm" style={{ animationDelay: '0ms', animationFillMode: 'both' }}>
             <span className="flex h-2 w-2 rounded-full bg-naira-green animate-pulse"></span>
             Digitizing rotating savings & trust
           </div>
           
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-charcoal mb-6">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-charcoal mb-6 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
             Save, Rotate & Pay Out <span className="text-naira-green underline decoration-naira-gold decoration-4 underline-offset-4">With Trust</span>.
           </h1>
           
-          <p className="text-lg text-charcoal/80 leading-relaxed mb-8">
+          <p className="text-lg text-charcoal/80 leading-relaxed mb-8 animate-fade-in-up" style={{ animationDelay: '250ms', animationFillMode: 'both' }}>
             Digitize your traditional rotating savings (Ajo/Esusu). Circle members contribute automatically, while payouts rotate securely via the Monnify API. Anyone can join, pay in, or monitor progress offline using our built-in **USSD flow**.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
             {user ? (
               <button
                 onClick={() => router.push("/dashboard")}
-                className="w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer"
+                className="w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer"
               >
                 Enter Dashboard <ArrowRight size={20} />
               </button>
@@ -191,13 +196,13 @@ export default function LandingPage() {
               <>
                 <button
                   onClick={() => setAuthModal({ isOpen: true, mode: "register" })}
-                  className="w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer"
                 >
                   Create your first Circle <ArrowRight size={20} />
                 </button>
                 <button
                   onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
-                  className="w-full sm:w-auto px-8 py-4 bg-white text-charcoal border border-charcoal/10 font-bold rounded-xl hover:bg-charcoal/[0.02] transition flex items-center justify-center gap-2 text-lg cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-4 bg-white/60 backdrop-blur-md text-charcoal border border-charcoal/10 font-bold rounded-xl hover:bg-white/80 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2 text-lg cursor-pointer"
                 >
                   Join existing Circle
                 </button>
@@ -207,122 +212,140 @@ export default function LandingPage() {
         </div>
 
         {/* Feature Visual */}
-        <div className="flex-1 w-full max-w-lg lg:max-w-none flex justify-center">
-          <div className="relative w-full aspect-square max-w-[420px] rounded-3xl bg-gradient-to-br from-naira-green/10 to-naira-gold/15 p-6 border border-white/50 shadow-2xl flex flex-col justify-between">
+        <div className="flex-grow flex-1 w-full max-w-lg lg:max-w-none flex justify-center animate-fade-in-up" style={{ animationDelay: '550ms', animationFillMode: 'both' }}>
+          <div className="relative w-full aspect-square max-w-[420px] rounded-3xl glass-card p-6 shadow-xl flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-naira-green/5 group">
+            {/* Subtle radial sheen on hover */}
+            <div className="absolute inset-0 bg-radial from-naira-green/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
             {/* Visual Header */}
-            <div className="flex items-center justify-between border-b border-charcoal/5 pb-4">
+            <div className="flex items-center justify-between border-b border-charcoal/5 pb-4 z-10">
               <div>
                 <span className="text-xs font-semibold text-charcoal/50 uppercase tracking-wider">Ajo Circle</span>
                 <h3 className="font-display font-bold text-lg text-charcoal">Ajegunle Traders</h3>
               </div>
-              <div className="px-3 py-1.5 rounded-xl bg-naira-gold/15 text-naira-gold font-display font-semibold text-sm border border-naira-gold/10">
+              <div className="px-3.5 py-1.5 rounded-xl bg-naira-gold/15 text-naira-gold font-display font-semibold text-sm border border-naira-gold/10">
                 Weekly Rotation
               </div>
             </div>
 
             {/* Simulated Wheel Concept */}
-            <div className="flex-grow flex items-center justify-center py-6 relative">
+            <div className="flex-grow flex items-center justify-center py-6 relative z-10">
               {/* Outer circle */}
-              <div className="w-56 h-56 rounded-full border-[6px] border-charcoal/5 relative flex items-center justify-center">
+              <div className="w-56 h-56 rounded-full border-[6px] border-charcoal/5 relative flex items-center justify-center bg-white/20 backdrop-blur-sm shadow-inner">
                 {/* Rotating segment overlay */}
-                <div className="absolute inset-[-6px] rounded-full border-[6px] border-transparent border-t-naira-green border-r-naira-green rotate-45"></div>
+                <div className="absolute inset-[-6px] rounded-full border-[6px] border-transparent border-t-naira-green border-r-naira-green rotate-45 animate-[spin_12s_linear_infinite]"></div>
                 
                 {/* Center pot info */}
                 <div className="text-center z-10 px-4">
-                  <span className="text-xs font-semibold text-charcoal/50 uppercase tracking-wider">Total Pot</span>
-                  <div className="font-display font-extrabold text-2xl text-naira-green mt-1">₦40,000</div>
+                  <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-wider block">Total Pot</span>
+                  <div className="font-display font-extrabold text-2xl text-naira-green mt-1 tabular-numbers">₦40,000</div>
                   <span className="text-[11px] font-medium text-charcoal/60 mt-1 block">3 of 4 paid this week</span>
                 </div>
 
                 {/* Shifting icons representing users */}
-                <div className="absolute top-[-14px] bg-naira-green text-white font-bold w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white">CO</div>
-                <div className="absolute right-[-14px] bg-naira-green text-white font-bold w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white">FA</div>
-                <div className="absolute bottom-[-14px] bg-naira-green text-white font-bold w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white">IM</div>
-                <div className="absolute left-[-14px] bg-naira-gold-light border-2 border-naira-gold text-naira-gold font-bold w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md">CN</div>
+                <div className="absolute top-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">CO</div>
+                <div className="absolute right-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">FA</div>
+                <div className="absolute bottom-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">IM</div>
+                <div className="absolute left-[-14px] bg-naira-gold-light border-2 border-naira-gold text-naira-gold font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md transition-all duration-300 hover:scale-110 animate-[pulse_2.5s_infinite]">CN</div>
               </div>
             </div>
 
             {/* Visual Footer */}
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 border border-white flex items-center justify-between">
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-white/60 flex items-center justify-between z-10 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-naira-green-light flex items-center justify-center text-naira-green">
                   <Landmark size={16} />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-charcoal">Wema Bank (Reserved)</h4>
-                  <p className="text-[10px] font-mono text-charcoal/60">9921029384</p>
+                  <p className="text-[10px] font-mono text-charcoal/60 font-bold">9921029384</p>
                 </div>
               </div>
-              <span className="text-xs font-semibold text-naira-green bg-naira-green-light px-2.5 py-1 rounded-lg">₦10,000 / member</span>
+              <span className="text-xs font-semibold text-naira-green bg-naira-green-light px-2.5 py-1 rounded-lg border border-naira-green/5 tabular-numbers">₦10,000 / member</span>
             </div>
           </div>
         </div>
       </main>
 
       {/* Grid of features */}
-      <section className="bg-charcoal text-white py-16 px-6 relative z-10">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="max-w-xl mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white mb-4">
+      <section className="bg-[#181a1d] text-white py-20 px-6 relative z-10 border-t border-white/5 overflow-hidden">
+        {/* Dark Ambient Blobs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/10 blur-[130px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-terracotta/5 blur-[120px]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="max-w-xl mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 text-naira-gold font-display font-semibold text-xs mb-4 border border-white/10">
+              FEATURES
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
               Digitized for convenience, built for accessibility.
             </h2>
             <p className="text-white/70 leading-relaxed">
-              We bridges the gap between digital banking and the realities of everyday Nigerian retail savings.
+              We bridge the gap between modern digital banking and the realities of everyday communal savings.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
-              <div className="w-12 h-12 rounded-xl bg-naira-green/20 text-naira-green flex items-center justify-center mb-6">
-                <CircleDollarSign size={24} />
+            <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-naira-green/10 text-naira-green flex items-center justify-center mb-6 border border-naira-green/20 group-hover:scale-110 transition-transform duration-300">
+                  <CircleDollarSign size={24} />
+                </div>
+                <h3 className="font-display font-bold text-lg mb-3">Monnify Sandbox Core</h3>
+                <p className="text-white/60 leading-relaxed text-sm">
+                  Each member gets a dedicated virtual account on join. Pay via card, transfer, or local banking options. Confirmations settle instantly.
+                </p>
               </div>
-              <h3 className="font-display font-bold text-lg mb-3">Monnify Sandbox Core</h3>
-              <p className="text-white/60 leading-relaxed text-sm">
-                Each member gets a dedicated virtual account on join. Pay via card, transfer, or local banking options. Confirmations settle instantly.
-              </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
-              <div className="w-12 h-12 rounded-xl bg-naira-gold/20 text-naira-gold flex items-center justify-center mb-6">
-                <PhoneCall size={24} />
+            <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-naira-gold/10 text-naira-gold flex items-center justify-center mb-6 border border-naira-gold/20 group-hover:scale-110 transition-transform duration-300">
+                  <PhoneCall size={24} />
+                </div>
+                <h3 className="font-display font-bold text-lg mb-3">Feature Phone USSD Menu</h3>
+                <p className="text-white/60 leading-relaxed text-sm">
+                  Members without smartphones can dial <code className="text-naira-gold font-mono bg-white/10 px-1.5 py-0.5 rounded">*384*TRADER#</code> to join, check contribution deadlines, view recipient rotation, and see payout bank details.
+                </p>
               </div>
-              <h3 className="font-display font-bold text-lg mb-3">Feature Phone USSD Menu</h3>
-              <p className="text-white/60 leading-relaxed text-sm">
-                Members without smartphones can dial <code className="text-naira-gold font-mono bg-white/10 px-1.5 py-0.5 rounded">*384*TRADER#</code> to join, check contribution deadlines, view recipient rotation, and see payout bank details.
-              </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
-              <div className="w-12 h-12 rounded-xl bg-terracotta/20 text-terracotta flex items-center justify-center mb-6">
-                <ShieldCheck size={24} />
+            <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-terracotta/10 text-terracotta flex items-center justify-center mb-6 border border-terracotta/20 group-hover:scale-110 transition-transform duration-300">
+                  <ShieldCheck size={24} />
+                </div>
+                <h3 className="font-display font-bold text-lg mb-3">Automated Payout Loop</h3>
+                <p className="text-white/60 leading-relaxed text-sm">
+                  Once the cycle's contributions land, the app instantly triggers Monnify payouts to that cycle's designated recipient. Zero delay, zero administrative overhead.
+                </p>
               </div>
-              <h3 className="font-display font-bold text-lg mb-3">Automated Payout Loop</h3>
-              <p className="text-white/60 leading-relaxed text-sm">
-                Once the cycle's contributions land, the app instantly triggers Monnify payouts to that cycle's designated recipient. Zero delay, zero administrative overhead.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-charcoal border-t border-white/5 py-8 text-center text-white/40 text-sm z-10">
+      <footer className="bg-[#121416] border-t border-white/5 py-8 text-center text-white/40 text-sm z-10 relative">
         <p>&copy; {new Date().getFullYear()} AjoCircles. Built for the Hackathon.</p>
       </footer>
 
       {/* Authentication Modal */}
       {authModal.isOpen && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 border border-charcoal/5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
             <button
               onClick={() => {
                 setError("");
                 setAuthModal({ isOpen: false, mode: "login" });
               }}
-              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition text-xl cursor-pointer"
+              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition-colors duration-200 text-xl cursor-pointer w-8 h-8 rounded-full bg-charcoal/5 flex items-center justify-center hover:bg-charcoal/10"
             >
               &times;
             </button>
@@ -334,7 +357,7 @@ export default function LandingPage() {
                   setError("");
                   setAuthModal({ isOpen: true, mode: "login" });
                 }}
-                className={`flex-1 pb-3 text-center font-display font-bold text-lg transition border-b-2 cursor-pointer ${
+                className={`flex-1 pb-3 text-center font-display font-bold text-lg transition-colors duration-300 border-b-2 cursor-pointer ${
                   authModal.mode === "login" 
                     ? "border-naira-green text-naira-green" 
                     : "border-transparent text-charcoal/40"
@@ -347,7 +370,7 @@ export default function LandingPage() {
                   setError("");
                   setAuthModal({ isOpen: true, mode: "register" });
                 }}
-                className={`flex-1 pb-3 text-center font-display font-bold text-lg transition border-b-2 cursor-pointer ${
+                className={`flex-1 pb-3 text-center font-display font-bold text-lg transition-colors duration-300 border-b-2 cursor-pointer ${
                   authModal.mode === "register" 
                     ? "border-naira-green text-naira-green" 
                     : "border-transparent text-charcoal/40"
@@ -358,9 +381,9 @@ export default function LandingPage() {
             </div>
 
             {error && (
-              <div className="mb-6 p-4 rounded-xl bg-terracotta/10 border border-terracotta/20 text-terracotta text-sm font-semibold">
-                {error}
-              </div>
+               <div className="mb-6 p-4 rounded-xl bg-terracotta/10 border border-terracotta/20 text-terracotta text-sm font-semibold">
+                 {error}
+               </div>
             )}
 
             <form onSubmit={handleAuthSubmit} className="space-y-4">
@@ -373,7 +396,7 @@ export default function LandingPage() {
                     placeholder="Chinedu Obi"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-medium"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-medium focus:bg-white focus:border-naira-green/35 transition-all"
                   />
                 </div>
               )}
@@ -386,7 +409,7 @@ export default function LandingPage() {
                   placeholder="08012345678"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-medium focus:bg-white focus:border-naira-green/35 transition-all"
                 />
               </div>
 
@@ -398,7 +421,7 @@ export default function LandingPage() {
                     placeholder="chinedu@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-medium"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-medium focus:bg-white focus:border-naira-green/35 transition-all"
                   />
                 </div>
               )}
@@ -413,7 +436,7 @@ export default function LandingPage() {
                   maxLength={6}
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring text-center tracking-widest font-mono text-xl"
+                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring text-center tracking-widest font-mono text-xl focus:bg-white focus:border-naira-green/35 transition-all"
                 />
               </div>
 
@@ -424,7 +447,7 @@ export default function LandingPage() {
                     <span className="text-xs font-bold uppercase tracking-wider">Disbursement Bank details</span>
                   </div>
                   <p className="text-[11px] text-charcoal/60 leading-relaxed">
-                    This is your personal bank account. This is where your lump sum payouts will be sent automatically.
+                    This is your personal bank account where your lump sum payouts will be automatically credited.
                   </p>
                   
                   <div className="grid grid-cols-2 gap-3">
@@ -433,7 +456,7 @@ export default function LandingPage() {
                       <select
                         value={bankCode}
                         onChange={handleBankChange}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-semibold"
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-semibold focus:bg-white transition-all"
                       >
                         {bankList.map((b) => (
                           <option key={b.code} value={b.code}>
@@ -453,7 +476,7 @@ export default function LandingPage() {
                         maxLength={10}
                         value={bankAccount}
                         onChange={(e) => setBankAccount(e.target.value)}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-mono font-bold"
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-mono font-bold focus:bg-white transition-all"
                       />
                     </div>
                   </div>
@@ -463,7 +486,7 @@ export default function LandingPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition shadow-lg shadow-naira-green/20 disabled:opacity-50 mt-4 cursor-pointer"
+                className="w-full py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-naira-green/20 disabled:opacity-50 mt-4 cursor-pointer"
               >
                 {submitting ? "Processing..." : authModal.mode === "login" ? "Sign In" : "Register"}
               </button>

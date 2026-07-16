@@ -50,13 +50,7 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
-  // USSD Simulator State
-  const [selectedSimUser, setSelectedSimUser] = useState<any>(null);
-  const [ussdSessionText, setUssdSessionText] = useState("");
-  const [ussdScreenText, setUssdScreenText] = useState("");
-  const [ussdInput, setUssdInput] = useState("");
-  const [isUssdActive, setIsUssdActive] = useState(false);
-  const [isUssdEnding, setIsUssdEnding] = useState(false);
+  // (USSD Simulator state removed to separate page)
 
   // Poll intervals
   const pollTimerRef = useRef<any>(null);
@@ -72,7 +66,6 @@ export default function DashboardPage() {
         }
         const data = await res.json();
         setUser(data.user);
-        setSelectedSimUser(data.user); // Default simulator phone to logged-in user
 
         // Fetch user's circles
         const circlesRes = await fetch("/api/circles");
@@ -240,103 +233,7 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  // --- USSD Emulator Functions ---
-  const handleUssdDial = async () => {
-    if (!selectedSimUser) return;
-    setUssdSessionText("");
-    setIsUssdActive(true);
-    setIsUssdEnding(false);
-    setUssdScreenText("Connecting to gateway...");
-
-    try {
-      const res = await fetch("/api/ussd", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: `sim_${Date.now()}`,
-          serviceCode: "*384*30#",
-          phoneNumber: selectedSimUser.phone,
-          text: "",
-        }),
-      });
-
-      const text = await res.text();
-      processUssdResponse(text);
-    } catch (err) {
-      console.error("USSD call failed:", err);
-      setUssdScreenText("END Connection error.");
-      setIsUssdEnding(true);
-    }
-  };
-
-  const handleUssdSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!isUssdActive || isUssdEnding || !selectedSimUser) return;
-
-    // Append new input to session
-    const nextSessionText = ussdSessionText === "" ? ussdInput : `${ussdSessionText}*${ussdInput}`;
-    setUssdSessionText(nextSessionText);
-    setUssdInput("");
-    setUssdScreenText("Sending request...");
-
-    try {
-      const res = await fetch("/api/ussd", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: `sim_${Date.now()}`,
-          serviceCode: "*384*30#",
-          phoneNumber: selectedSimUser.phone,
-          text: nextSessionText,
-        }),
-      });
-
-      const text = await res.text();
-      processUssdResponse(text);
-    } catch (err) {
-      console.error("USSD submit failed:", err);
-      setUssdScreenText("END Connection error.");
-      setIsUssdEnding(true);
-    }
-  };
-
-  const processUssdResponse = (raw: string) => {
-    if (raw.startsWith("CON ")) {
-      setUssdScreenText(raw.substring(4));
-      setIsUssdEnding(false);
-    } else if (raw.startsWith("END ")) {
-      setUssdScreenText(raw.substring(4));
-      setIsUssdEnding(true);
-    } else {
-      setUssdScreenText(raw);
-      setIsUssdEnding(true);
-    }
-  };
-
-  const handleUssdKeypress = (key: string) => {
-    if (!isUssdActive) {
-      if (key === "SEND") handleUssdDial();
-      return;
-    }
-    if (isUssdEnding) {
-      if (key === "CLEAR") {
-        setIsUssdActive(false);
-        setUssdSessionText("");
-        setUssdScreenText("");
-      }
-      return;
-    }
-
-    if (key === "SEND") {
-      handleUssdSubmit();
-    } else if (key === "CLEAR") {
-      setUssdInput("");
-    } else if (key === "BACK") {
-      setUssdInput((p) => p.slice(0, -1));
-    } else {
-      setUssdInput((p) => p + key);
-    }
-  };
+  // (USSD Simulator functions moved to separate page)
 
   // Mock a Webhook Payment for Demo
   const triggerMockPaymentWebhook = async (memberAccountNumber: string, amount: number) => {
@@ -567,12 +464,22 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row min-h-screen bg-warm-linen">
+    <div className="flex-grow flex flex-col md:flex-row min-h-screen bg-warm-linen relative overflow-hidden">
+      {/* Ambient Drifting Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
+        <div className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-terracotta/5 blur-[130px] animate-blob-3" />
+      </div>
+
+      {/* Grain Texture Overlay */}
+      <div className="grain-overlay" />
+
       {/* Left panel: Circle overview & selector */}
-      <aside className="w-full md:w-64 border-r border-charcoal/5 flex flex-col justify-between p-6 bg-white/70 backdrop-blur-md">
+      <aside className="w-full md:w-64 border-r border-charcoal/5 flex flex-col justify-between p-6 bg-white/35 backdrop-blur-xl z-20">
         <div>
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-8">
+          <div className="flex items-center gap-2 mb-8 transition-transform duration-300 hover:scale-[1.02]">
             <div className="w-8 h-8 rounded-lg bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/10">
               <span className="font-display font-extrabold text-sm">₦</span>
             </div>
@@ -580,14 +487,14 @@ export default function DashboardPage() {
           </div>
 
           {/* User Profile */}
-          <div className="bg-warm-linen/60 rounded-2xl p-4 border border-charcoal/5 mb-6">
+          <div className="bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-white/50 mb-6 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-naira-green text-white font-display font-bold flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-naira-green text-white font-display font-bold flex items-center justify-center shadow-sm">
                 {user?.name?.[0].toUpperCase()}
               </div>
               <div className="overflow-hidden">
                 <h4 className="text-xs font-bold text-charcoal truncate">{user?.name}</h4>
-                <p className="text-[10px] text-charcoal/60 truncate font-mono">{user?.phone}</p>
+                <p className="text-[10px] text-charcoal/60 truncate font-mono font-bold">{user?.phone}</p>
               </div>
             </div>
           </div>
@@ -599,14 +506,14 @@ export default function DashboardPage() {
               <button 
                 onClick={() => setIsJoinOpen(true)}
                 title="Join Circle"
-                className="w-6 h-6 rounded-md bg-naira-green-light text-naira-green flex items-center justify-center hover:bg-naira-green/20 transition cursor-pointer"
+                className="w-6.5 h-6.5 rounded-lg bg-naira-green-light text-naira-green flex items-center justify-center hover:bg-naira-green/20 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-naira-green/5"
               >
                 <Users size={12} />
               </button>
               <button 
                 onClick={() => setIsCreateOpen(true)}
                 title="Create Circle"
-                className="w-6 h-6 rounded-md bg-naira-green text-white flex items-center justify-center hover:bg-naira-green/90 transition cursor-pointer"
+                className="w-6.5 h-6.5 rounded-lg bg-naira-green text-white flex items-center justify-center hover:bg-naira-green/90 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-naira-green/10"
               >
                 <Plus size={12} />
               </button>
@@ -614,7 +521,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Circle Selector List */}
-          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
             {circles.length === 0 ? (
               <p className="text-xs text-charcoal/40 italic text-center py-4">No circles joined yet.</p>
             ) : (
@@ -622,16 +529,16 @@ export default function DashboardPage() {
                 <button
                   key={c.id}
                   onClick={() => setSelectedCircleId(c.id)}
-                  className={`w-full text-left p-3.5 rounded-xl border transition flex items-center justify-between cursor-pointer ${
+                  className={`w-full text-left p-3.5 rounded-xl border transition-all duration-300 flex items-center justify-between cursor-pointer hover:scale-[1.01] ${
                     selectedCircleId === c.id
-                      ? "bg-naira-green-light border-naira-green/10 text-naira-green font-bold shadow-sm"
-                      : "bg-transparent border-transparent hover:bg-charcoal/[0.02] text-charcoal/70"
+                      ? "bg-white/90 border-white/90 text-naira-green font-bold shadow-md shadow-naira-green/[0.03]"
+                      : "bg-transparent border-transparent hover:bg-white/30 text-charcoal/70"
                   }`}
                 >
                   <span className="text-xs truncate mr-2">{c.name}</span>
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                     c.status === "ACTIVE" 
-                      ? "bg-naira-green/10 text-naira-green" 
+                      ? "bg-naira-green/10 text-naira-green border border-naira-green/5" 
                       : "bg-charcoal/10 text-charcoal"
                   }`}>
                     ₦{(c.contributionAmount / 1000).toFixed(0)}k
@@ -640,18 +547,28 @@ export default function DashboardPage() {
               ))
             )}
           </div>
+
+          {/* USSD Simulator Navigation Link */}
+          <div className="mt-8 border-t border-charcoal/5 pt-4">
+            <button
+              onClick={() => router.push("/ussd-simulator")}
+              className="w-full py-2.5 px-4 rounded-xl bg-naira-green-light hover:bg-naira-green text-naira-green hover:text-white border border-naira-green/5 font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01]"
+            >
+              <Phone size={14} /> USSD Simulator
+            </button>
+          </div>
         </div>
 
         <button
           onClick={handleLogout}
-          className="w-full mt-6 py-2.5 rounded-xl border border-charcoal/5 text-xs font-semibold text-charcoal/60 hover:text-terracotta hover:bg-terracotta/5 transition flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full mt-6 py-2.5 rounded-xl border border-charcoal/5 text-xs font-semibold text-charcoal/60 hover:text-terracotta hover:bg-terracotta/5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01]"
         >
           <LogOut size={14} /> Log Out
         </button>
       </aside>
 
       {/* Center panel: Circle details & payout wheel */}
-      <main className="flex-1 flex flex-col p-6 md:p-8 z-10 overflow-y-auto">
+      <main className="flex-1 flex flex-col p-6 md:p-8 z-20 overflow-y-auto">
         {detailLoading && !circleDetail ? (
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-10 h-10 rounded-full border-4 border-naira-green border-t-transparent animate-spin"></div>
@@ -659,7 +576,7 @@ export default function DashboardPage() {
           </div>
         ) : !circleDetail ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto">
-            <div className="w-16 h-16 rounded-3xl bg-naira-green-light text-naira-green flex items-center justify-center mb-6">
+            <div className="w-16 h-16 rounded-3xl bg-white/70 text-naira-green flex items-center justify-center mb-6 shadow-md border border-white/60">
               <Layers size={32} />
             </div>
             <h3 className="font-display font-extrabold text-xl mb-3 text-charcoal">Get Started</h3>
@@ -669,13 +586,13 @@ export default function DashboardPage() {
             <div className="flex gap-4 w-full">
               <button 
                 onClick={() => setIsJoinOpen(true)}
-                className="flex-1 py-3 bg-white text-charcoal border border-charcoal/10 font-bold rounded-xl text-xs hover:bg-charcoal/[0.01] cursor-pointer"
+                className="flex-1 py-3 bg-white/60 backdrop-blur-md text-charcoal border border-charcoal/10 font-bold rounded-xl text-xs hover:bg-white hover:scale-[1.02] transition-all cursor-pointer"
               >
                 Join with Code
               </button>
               <button 
                 onClick={() => setIsCreateOpen(true)}
-                className="flex-1 py-3 bg-naira-green text-white font-bold rounded-xl text-xs hover:bg-naira-green/90 shadow-md shadow-naira-green/10 cursor-pointer"
+                className="flex-1 py-3 bg-naira-green text-white font-bold rounded-xl text-xs hover:bg-naira-green/90 hover:scale-[1.02] transition-all shadow-md shadow-naira-green/10 cursor-pointer"
               >
                 Create Circle
               </button>
@@ -687,7 +604,7 @@ export default function DashboardPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-charcoal/5 pb-5">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[10px] font-bold text-naira-green bg-naira-green-light px-2.5 py-0.5 rounded-full border border-naira-green/10">
+                  <span className="text-[10px] font-bold text-naira-green bg-naira-green-light px-2.5 py-0.5 rounded-full border border-naira-green/10 tabular-numbers">
                     Cycle {circleDetail.circle.currentCycleNumber} of {circleDetail.circle.memberCount}
                   </span>
                   <span className="text-xs font-semibold text-charcoal/40">•</span>
@@ -698,14 +615,14 @@ export default function DashboardPage() {
 
               {/* Invite Code Clipboard */}
               <div className="flex items-center gap-2">
-                <div className="bg-white rounded-xl p-3 border border-charcoal/5 shadow-sm flex items-center gap-3">
+                <div className="glass-card rounded-2xl p-3 shadow-md border border-white/60 flex items-center gap-3 transition-all hover:scale-[1.01]">
                   <div className="text-right">
                     <span className="text-[9px] font-bold text-charcoal/40 uppercase block leading-none mb-1">Invite Code</span>
                     <span className="font-mono font-bold text-xs tracking-wider text-charcoal">{circleDetail.circle.inviteCode}</span>
                   </div>
                   <button
                     onClick={() => copyToClipboard(circleDetail.circle.inviteCode, "code")}
-                    className="w-8 h-8 rounded-lg bg-warm-linen/60 text-charcoal/60 hover:text-charcoal hover:bg-charcoal/5 transition flex items-center justify-center cursor-pointer"
+                    className="w-8 h-8 rounded-lg bg-white/40 hover:bg-white/80 transition flex items-center justify-center cursor-pointer shadow-sm border border-white/50"
                   >
                     {copiedText === "code" ? <Check size={14} className="text-naira-green" /> : <Copy size={14} />}
                   </button>
@@ -716,7 +633,7 @@ export default function DashboardPage() {
             {/* Core Row: Payout Wheel and Bank info */}
             <div className="grid lg:grid-cols-12 gap-6 items-start">
               {/* Central Box for Payout Wheel */}
-              <div className="lg:col-span-7 bg-white rounded-3xl p-6 border border-charcoal/5 shadow-sm flex flex-col items-center">
+              <div className="lg:col-span-7 glass-card rounded-3xl p-6 shadow-md border border-white/50 flex flex-col items-center transition-all hover:shadow-lg">
                 <div className="w-full flex items-center justify-between mb-4">
                   <h3 className="font-display font-bold text-sm text-charcoal">Payout Rotation</h3>
                   <span className="text-[11px] font-medium text-charcoal/50">Next payout recipient: <strong className="text-naira-gold font-bold">
@@ -730,10 +647,10 @@ export default function DashboardPage() {
               <div className="lg:col-span-5 space-y-6">
                 {/* Bank Reserved Account Card */}
                 {circleDetail.myMemberId && (
-                  <div className="bg-gradient-to-br from-charcoal to-[#2D3035] rounded-3xl p-6 text-white shadow-lg border border-white/5 relative overflow-hidden">
+                  <div className="bg-gradient-to-br from-charcoal/95 to-[#1c1f24] backdrop-blur-xl rounded-3xl p-6 text-white shadow-xl border border-white/10 relative overflow-hidden group">
                     <div className="absolute top-[-40px] right-[-40px] w-24 h-24 rounded-full bg-white/5 filter blur-md"></div>
                     <div className="flex items-center gap-2 mb-6">
-                      <Landmark size={18} className="text-naira-gold" />
+                      <Landmark size={18} className="text-naira-gold animate-[pulse_3s_infinite]" />
                       <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">My Virtual Reserved Account</span>
                     </div>
 
@@ -746,7 +663,6 @@ export default function DashboardPage() {
                             <p className="text-xs text-white/60">Reserved account not provisioned yet.</p>
                             <button
                               onClick={async () => {
-                                // Simple trigger retry
                                 await fetchCircleDetails();
                               }}
                               className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded text-[10px] font-semibold transition"
@@ -767,19 +683,19 @@ export default function DashboardPage() {
                           <div className="flex items-center justify-between border-t border-white/5 pt-3.5">
                             <div>
                               <span className="text-[9px] uppercase font-bold text-white/40 tracking-wider">Virtual Account Number</span>
-                              <h3 className="font-mono font-bold text-lg tracking-wider text-naira-gold">{myMember.monnifyReservedAccountNumber}</h3>
+                              <h3 className="font-mono font-extrabold text-xl tracking-widest text-naira-gold tabular-numbers">{myMember.monnifyReservedAccountNumber}</h3>
                             </div>
                             <button
                               onClick={() => copyToClipboard(myMember.monnifyReservedAccountNumber, "account")}
-                              className="w-8 h-8 rounded-lg bg-white/10 text-white/70 hover:text-white hover:bg-white/15 transition flex items-center justify-center cursor-pointer"
+                              className="w-8 h-8 rounded-lg bg-white/10 text-white/70 hover:text-white hover:bg-white/15 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer border border-white/5"
                             >
                               {copiedText === "account" ? <Check size={14} className="text-naira-green" /> : <Copy size={14} />}
                             </button>
                           </div>
 
                           <div className="border-t border-white/5 pt-3.5">
-                            <p className="text-[10px] text-white/50 leading-normal">
-                              Transfer <strong className="text-white font-bold">₦{circleDetail.circle.contributionAmount.toLocaleString()}</strong> to this account to mark yourself paid for Cycle {circleDetail.circle.currentCycleNumber}. Acceptable payment channels include Bank App Transfer and USSD.
+                            <p className="text-[11px] text-white/50 leading-relaxed tabular-numbers">
+                              Transfer <strong className="text-white font-bold">₦{circleDetail.circle.contributionAmount.toLocaleString()}</strong> to this account to mark yourself paid for Cycle {circleDetail.circle.currentCycleNumber}. Acceptable channels include Bank App Transfer and USSD.
                             </p>
                           </div>
                           
@@ -787,7 +703,7 @@ export default function DashboardPage() {
                           <div className="border-t border-white/5 pt-3.5 flex gap-2">
                             <button
                               onClick={() => triggerMockPaymentWebhook(myMember.monnifyReservedAccountNumber, circleDetail.circle.contributionAmount)}
-                              className="flex-1 py-2 bg-naira-green text-white rounded-lg text-[9px] font-bold hover:bg-naira-green/90 transition flex items-center justify-center gap-1 cursor-pointer"
+                              className="flex-1 py-2 bg-naira-green text-white rounded-lg text-[9px] font-bold hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-naira-green/10"
                             >
                               <Play size={10} /> Simulate Webhook Payment
                             </button>
@@ -801,10 +717,10 @@ export default function DashboardPage() {
                 {/* Crypto Affordance roadmap teaser */}
                 <button
                   onClick={() => setIsCryptoOpen(true)}
-                  className="w-full p-4 rounded-2xl bg-white border border-charcoal/5 shadow-sm hover:border-naira-green/30 transition flex items-center justify-between text-left cursor-pointer"
+                  className="w-full p-4 rounded-2xl glass-card border border-white/50 shadow-md hover:border-naira-green/30 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 flex items-center justify-between text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-naira-gold-light text-naira-gold flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-naira-gold-light text-naira-gold flex items-center justify-center border border-naira-gold/10">
                       <Wallet size={16} />
                     </div>
                     <div>
@@ -818,7 +734,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Bottom Row: Member payment status list */}
-            <div className="bg-white rounded-3xl p-6 border border-charcoal/5 shadow-sm">
+            <div className="glass-card rounded-3xl p-6 border border-white/50 shadow-md transition-all hover:shadow-lg">
               <h3 className="font-display font-bold text-sm mb-4 text-charcoal">Circle Members Payment Status</h3>
               
               <div className="overflow-x-auto">
@@ -843,16 +759,16 @@ export default function DashboardPage() {
                       const isRecipient = m.id === circleDetail.circle.currentRecipientId;
 
                       return (
-                        <tr key={m.id} className="hover:bg-charcoal/[0.01]">
+                        <tr key={m.id} className="hover:bg-naira-green/[0.02] transition-colors duration-150">
                           <td className="py-3.5 font-display font-extrabold text-charcoal/50">#{idx + 1}</td>
                           <td className="py-3.5 font-semibold text-charcoal">
                             <span className="flex items-center gap-1.5">
                               {m.user.name} 
                               {isCurrentUser && <span className="text-[9px] bg-charcoal/10 text-charcoal px-1.5 py-0.25 rounded-md font-medium">You</span>}
-                              {isRecipient && <span className="text-[9px] bg-naira-gold-light text-naira-gold border border-naira-gold/15 px-1.5 py-0.25 rounded-md font-bold">Recipient</span>}
+                              {isRecipient && <span className="text-[9px] bg-naira-gold-light text-naira-gold border border-naira-gold/15 px-1.5 py-0.25 rounded-md font-bold animate-[pulse_2s_infinite]">Recipient</span>}
                             </span>
                           </td>
-                          <td className="py-3.5 font-mono text-charcoal/60">{m.user.phone}</td>
+                          <td className="py-3.5 font-mono text-charcoal/60 font-semibold">{m.user.phone}</td>
                           <td className="py-3.5">
                             {isPaid ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-naira-green bg-naira-green-light px-2.5 py-0.5 rounded-full border border-naira-green/10">
@@ -869,7 +785,7 @@ export default function DashboardPage() {
                             {isCircleAdmin && !isPaid && circleDetail.circle.status === "ACTIVE" && (
                               <button
                                 onClick={() => handleManualOverride(m.id, circleDetail.circle.currentCycleNumber)}
-                                className="px-3 py-1.5 bg-naira-green-light hover:bg-naira-green/20 text-naira-green border border-naira-green/10 rounded-lg text-[10px] font-bold transition cursor-pointer"
+                                className="px-3 py-1.5 bg-naira-green-light hover:bg-naira-green/20 text-naira-green border border-naira-green/10 rounded-lg text-[10px] font-bold transition-all hover:scale-[1.02] cursor-pointer"
                               >
                                 Mark as Paid
                               </button>
@@ -886,137 +802,15 @@ export default function DashboardPage() {
         )}
       </main>
 
-      {/* Right panel: USSD Simulator Interface */}
-      <section className="w-full md:w-80 border-t md:border-t-0 md:border-l border-charcoal/5 bg-white/70 backdrop-blur-md p-6 flex flex-col justify-start z-10">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Phone size={16} className="text-naira-green" />
-            <h3 className="font-display font-extrabold text-sm text-charcoal">USSD Simulator</h3>
-          </div>
-          <p className="text-[11px] text-charcoal/60 leading-normal">
-            Dial savings codes, verify circle status, and make simulated payments from feature-phone dialers.
-          </p>
-        </div>
-
-        {/* Simulator Active User selector */}
-        {circleDetail && circleDetail.members && (
-          <div className="mb-4">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-charcoal/60 mb-1.5">Active Phone Number</label>
-            <select
-              value={selectedSimUser?.id || ""}
-              onChange={(e) => {
-                const member = circleDetail.members.find((m: any) => m.userId === e.target.value);
-                if (member) {
-                  setSelectedSimUser({ id: member.userId, name: member.user.name, phone: member.user.phone });
-                } else if (e.target.value === user?.id) {
-                  setSelectedSimUser(user);
-                }
-              }}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-charcoal/10 bg-white focus-ring font-semibold"
-            >
-              <option value={user?.id}>{user?.name} (You - {user?.phone})</option>
-              {circleDetail.members
-                .filter((m: any) => m.userId !== user?.id)
-                .map((m: any) => (
-                  <option key={m.id} value={m.userId}>
-                    {m.user.name} ({m.user.phone})
-                  </option>
-                ))}
-            </select>
-          </div>
-        )}
-
-        {/* NOKIA Mock phone device frame */}
-        <div className="mx-auto w-full max-w-[240px] aspect-[1/2] rounded-[36px] bg-charcoal p-3.5 shadow-2xl flex flex-col justify-between border-4 border-charcoal/80">
-          
-          {/* Mock Screen */}
-          <div className="flex-1 bg-[#879987] rounded-2xl p-3 font-mono text-xs text-[#1e231e] relative overflow-hidden flex flex-col justify-between border border-black/10 shadow-inner">
-            {/* Screen Header */}
-            <div className="border-b border-[#1e231e]/10 pb-1 flex justify-between items-center text-[9px] font-bold">
-              <span>{selectedSimUser?.name.split(" ")[0] || "SIM"}</span>
-              <span className="flex items-center gap-0.5"><Hash size={8} /> 4G</span>
-            </div>
-
-            {/* Screen Content */}
-            <div className="flex-grow py-2.5 overflow-y-auto leading-tight text-[11px] whitespace-pre-wrap select-text">
-              {isUssdActive ? (
-                ussdScreenText
-              ) : (
-                <div className="text-center py-6">
-                  <p className="text-[10px] opacity-60">DIAL CODE</p>
-                  <p className="text-md font-bold mt-1 tracking-wider">*384*30#</p>
-                  <p className="text-[9px] opacity-50 mt-1">Click SEND to dial</p>
-                </div>
-              )}
-            </div>
-
-            {/* Screen Input / Prompt area */}
-            {isUssdActive && !isUssdEnding && (
-              <div className="border-t border-[#1e231e]/10 pt-1.5 flex gap-1">
-                <span className="opacity-60">&gt;</span>
-                <input
-                  type="text"
-                  value={ussdInput}
-                  onChange={(e) => setUssdInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleUssdSubmit();
-                  }}
-                  className="flex-grow bg-transparent outline-none border-b border-[#1e231e]/20 font-bold"
-                  placeholder="..."
-                />
-              </div>
-            )}
-
-            {isUssdEnding && (
-              <div className="text-center pt-1 border-t border-[#1e231e]/10">
-                <button
-                  onClick={() => {
-                    setIsUssdActive(false);
-                    setUssdSessionText("");
-                    setUssdScreenText("");
-                  }}
-                  className="px-2 py-0.5 bg-[#1e231e]/10 rounded text-[9px] font-bold hover:bg-[#1e231e]/20"
-                >
-                  Dismiss
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Keypad controls */}
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-white">
-            {/* Top row */}
-            <button onClick={() => handleUssdKeypress("SEND")} className="py-2.5 rounded-lg bg-naira-green hover:bg-naira-green/80 font-bold text-[9px] shadow cursor-pointer">SEND</button>
-            <button onClick={() => handleUssdKeypress("CLEAR")} className="py-2.5 rounded-lg bg-terracotta hover:bg-terracotta/80 font-bold text-[9px] shadow cursor-pointer">CLEAR</button>
-            <button onClick={() => handleUssdKeypress("BACK")} className="py-2.5 rounded-lg bg-white/10 hover:bg-white/15 font-bold text-[9px] shadow cursor-pointer">BACK</button>
-            
-            {/* Standard digits */}
-            {["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"].map((k) => (
-              <button
-                key={k}
-                onClick={() => {
-                  if (isUssdActive && !isUssdEnding) {
-                    setUssdInput((p) => p + k);
-                  }
-                }}
-                className="py-1.5 rounded-lg bg-white/5 hover:bg-white/10 font-bold text-xs shadow active:bg-white/20 transition cursor-pointer"
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* --- MODAL DIALOGS --- */}
 
       {/* Create Circle Modal */}
       {isCreateOpen && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 border border-charcoal/5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
             <button
               onClick={() => setIsCreateOpen(false)}
-              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition text-xl cursor-pointer"
+              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition-colors duration-200 text-xl cursor-pointer w-8 h-8 rounded-full bg-charcoal/5 flex items-center justify-center hover:bg-charcoal/10"
             >
               &times;
             </button>
@@ -1037,7 +831,7 @@ export default function DashboardPage() {
                   placeholder="e.g. Alaba Traders"
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-medium"
+                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-medium focus:bg-white focus:border-naira-green/35 transition-all"
                 />
               </div>
 
@@ -1050,7 +844,7 @@ export default function DashboardPage() {
                     placeholder="10000"
                     value={createAmount}
                     onChange={(e) => setCreateAmount(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-bold"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-bold focus:bg-white focus:border-naira-green/35 transition-all"
                   />
                 </div>
 
@@ -1064,7 +858,7 @@ export default function DashboardPage() {
                     placeholder="4"
                     value={createMembers}
                     onChange={(e) => setCreateMembers(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-medium"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-medium focus:bg-white focus:border-naira-green/35 transition-all"
                   />
                 </div>
               </div>
@@ -1075,7 +869,7 @@ export default function DashboardPage() {
                   <select
                     value={createFrequency}
                     onChange={(e) => setCreateFrequency(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-semibold"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-semibold focus:bg-white transition-all"
                   >
                     <option value="WEEKLY">Weekly</option>
                     <option value="MONTHLY">Monthly</option>
@@ -1087,7 +881,7 @@ export default function DashboardPage() {
                   <select
                     value={createOrderType}
                     onChange={(e) => setCreateOrderType(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-semibold"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-semibold focus:bg-white transition-all"
                   >
                     <option value="FIXED">Join order (Fixed)</option>
                     <option value="RANDOM">Random shuffle</option>
@@ -1098,7 +892,7 @@ export default function DashboardPage() {
               <button
                 type="submit"
                 disabled={formSubmitting}
-                className="w-full py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition shadow-lg shadow-naira-green/20 disabled:opacity-50 mt-4 cursor-pointer"
+                className="w-full py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-naira-green/20 disabled:opacity-50 mt-4 cursor-pointer"
               >
                 {formSubmitting ? "Creating..." : "Create Circle & Virtual Account"}
               </button>
@@ -1109,11 +903,11 @@ export default function DashboardPage() {
 
       {/* Join Circle Modal */}
       {isJoinOpen && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 border border-charcoal/5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
             <button
               onClick={() => setIsJoinOpen(false)}
-              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition text-xl cursor-pointer"
+              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition-colors duration-200 text-xl cursor-pointer w-8 h-8 rounded-full bg-charcoal/5 flex items-center justify-center hover:bg-charcoal/10"
             >
               &times;
             </button>
@@ -1134,14 +928,14 @@ export default function DashboardPage() {
                   placeholder="e.g. TRADER"
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-warm-linen/50 focus-ring font-mono font-bold tracking-widest text-center text-lg"
+                  className="w-full px-4 py-3 rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-mono font-bold tracking-widest text-center text-lg focus:bg-white focus:border-naira-green/35 transition-all"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={formSubmitting}
-                className="w-full py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition shadow-lg shadow-naira-green/20 disabled:opacity-50 mt-4 cursor-pointer"
+                className="w-full py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-naira-green/20 disabled:opacity-50 mt-4 cursor-pointer"
               >
                 {formSubmitting ? "Joining..." : "Join & Provision Virtual Account"}
               </button>
@@ -1152,15 +946,15 @@ export default function DashboardPage() {
 
       {/* Crypto Affordance roadmap teaser */}
       {isCryptoOpen && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 border border-charcoal/5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
             <button
               onClick={() => setIsCryptoOpen(false)}
-              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition text-xl cursor-pointer"
+              className="absolute top-6 right-6 text-charcoal/40 hover:text-charcoal transition-colors duration-200 text-xl cursor-pointer w-8 h-8 rounded-full bg-charcoal/5 flex items-center justify-center hover:bg-charcoal/10"
             >
               &times;
             </button>
-            <div className="w-12 h-12 rounded-2xl bg-naira-gold-light text-naira-gold flex items-center justify-center mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-naira-gold-light text-naira-gold flex items-center justify-center mb-6 border border-naira-gold/15 shadow-sm">
               <Wallet size={24} />
             </div>
             <h3 className="font-display font-extrabold text-xl text-charcoal mb-3">Stablecoin Pay (Coming Soon)</h3>
@@ -1169,7 +963,7 @@ export default function DashboardPage() {
             </p>
             <button
               onClick={() => setIsCryptoOpen(false)}
-              className="w-full py-3 bg-charcoal text-white font-bold rounded-xl text-xs hover:bg-charcoal/95 cursor-pointer"
+              className="w-full py-3 bg-charcoal text-white font-bold rounded-xl text-xs hover:bg-charcoal/95 hover:scale-[1.01] transition-all cursor-pointer shadow-md"
             >
               Cool, got it!
             </button>
