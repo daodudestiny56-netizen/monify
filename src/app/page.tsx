@@ -13,13 +13,12 @@ export default function LandingPage() {
     mode: "login",
   });
 
-  // Form states
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [bankAccount, setBankAccount] = useState("");
-  const [bankCode, setBankCode] = useState("058"); // Default GTB
+  const [bankCode, setBankCode] = useState("058");
   const [bankName, setBankName] = useState("Guaranty Trust Bank");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -43,7 +42,6 @@ export default function LandingPage() {
     { code: "015", name: "Zenith Bank" },
   ];
 
-  // Fetch session on load
   useEffect(() => {
     async function checkSession() {
       try {
@@ -122,20 +120,17 @@ export default function LandingPage() {
 
   return (
     <div className="flex-grow flex flex-col relative overflow-hidden bg-warm-linen min-h-screen">
-      {/* Ambient Drifting Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
         <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
         <div className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-terracotta/5 blur-[130px] animate-blob-3" />
       </div>
 
-      {/* Grain Texture Overlay */}
       <div className="grain-overlay" />
 
-      {/* Floating Glass Header */}
       <header className="sticky top-4 max-w-7xl mx-auto w-[calc(100%-2rem)] px-6 py-4 flex items-center justify-between z-50 glass-card rounded-2xl my-4">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/20 transition-transform duration-350 hover:scale-105">
+          <div className="w-10 h-10 rounded-xl bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/20 transition-transform duration-355 hover:scale-105">
             <span className="font-display font-extrabold text-xl tracking-tight">₦</span>
           </div>
           <span className="font-display font-bold text-xl tracking-tight text-charcoal">Ajo<span className="text-naira-green">Circles</span></span>
@@ -168,7 +163,6 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Hero Section */}
       <main className="max-w-7xl mx-auto w-full px-6 py-12 lg:py-20 flex-grow flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
         <div className="flex-grow flex-1 max-w-xl text-center lg:text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-naira-green-light/80 text-naira-green font-display font-semibold text-sm mb-6 border border-naira-green/10 animate-fade-in-up shadow-sm" style={{ animationDelay: '0ms', animationFillMode: 'both' }}>
@@ -211,13 +205,10 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Feature Visual */}
         <div className="flex-grow flex-1 w-full max-w-lg lg:max-w-none flex justify-center animate-fade-in-up" style={{ animationDelay: '550ms', animationFillMode: 'both' }}>
           <div className="relative w-full aspect-square max-w-[420px] rounded-3xl glass-card p-6 shadow-xl flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-naira-green/5 group">
-            {/* Subtle radial sheen on hover */}
             <div className="absolute inset-0 bg-radial from-naira-green/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-            {/* Visual Header */}
             <div className="flex items-center justify-between border-b border-charcoal/5 pb-4 z-10">
               <div>
                 <span className="text-xs font-semibold text-charcoal/50 uppercase tracking-wider">Ajo Circle</span>
@@ -228,21 +219,16 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Simulated Wheel Concept */}
             <div className="flex-grow flex items-center justify-center py-6 relative z-10">
-              {/* Outer circle */}
               <div className="w-56 h-56 rounded-full border-[6px] border-charcoal/5 relative flex items-center justify-center bg-white/20 backdrop-blur-sm shadow-inner">
-                {/* Rotating segment overlay */}
                 <div className="absolute inset-[-6px] rounded-full border-[6px] border-transparent border-t-naira-green border-r-naira-green rotate-45 animate-[spin_12s_linear_infinite]"></div>
                 
-                {/* Center pot info */}
                 <div className="text-center z-10 px-4">
                   <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-wider block">Total Pot</span>
                   <div className="font-display font-extrabold text-2xl text-naira-green mt-1 tabular-numbers">₦40,000</div>
                   <span className="text-[11px] font-medium text-charcoal/60 mt-1 block">3 of 4 paid this week</span>
                 </div>
 
-                {/* Shifting icons representing users */}
                 <div className="absolute top-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">CO</div>
                 <div className="absolute right-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">FA</div>
                 <div className="absolute bottom-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">IM</div>
@@ -250,7 +236,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Visual Footer */}
             <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-white/60 flex items-center justify-between z-10 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-naira-green-light flex items-center justify-center text-naira-green">
@@ -267,9 +252,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Grid of features */}
       <section className="bg-[#181a1d] text-white py-20 px-6 relative z-10 border-t border-white/5 overflow-hidden">
-        {/* Dark Ambient Blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/10 blur-[130px]" />
           <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-terracotta/5 blur-[120px]" />
@@ -289,7 +272,6 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
             <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-naira-green/10 text-naira-green flex items-center justify-center mb-6 border border-naira-green/20 group-hover:scale-110 transition-transform duration-300">
@@ -302,7 +284,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 2 */}
             <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-naira-gold/10 text-naira-gold flex items-center justify-center mb-6 border border-naira-gold/20 group-hover:scale-110 transition-transform duration-300">
@@ -315,7 +296,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Feature 3 */}
             <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-terracotta/10 text-terracotta flex items-center justify-center mb-6 border border-terracotta/20 group-hover:scale-110 transition-transform duration-300">
@@ -331,12 +311,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[#121416] border-t border-white/5 py-8 text-center text-white/40 text-sm z-10 relative">
         <p>&copy; {new Date().getFullYear()} AjoCircles. Built for the Hackathon.</p>
       </footer>
 
-      {/* Authentication Modal */}
       {authModal.isOpen && (
         <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
@@ -350,7 +328,6 @@ export default function LandingPage() {
               &times;
             </button>
 
-            {/* Tabs */}
             <div className="flex border-b border-charcoal/5 mb-6">
               <button
                 onClick={() => {
@@ -459,9 +436,9 @@ export default function LandingPage() {
                         className="w-full px-3 py-2 text-xs rounded-xl border border-charcoal/10 bg-white/50 focus-ring font-semibold focus:bg-white transition-all"
                       >
                         {bankList.map((b) => (
-                          <option key={b.code} value={b.code}>
-                            {b.name}
-                          </option>
+                           <option key={b.code} value={b.code}>
+                             {b.name}
+                           </option>
                         ))}
                       </select>
                     </div>

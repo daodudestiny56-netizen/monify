@@ -11,7 +11,6 @@ export default function UssdSimulatorPage() {
   const [selectedSimUser, setSelectedSimUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // USSD Simulator State
   const [ussdSessionText, setUssdSessionText] = useState("");
   const [ussdScreenText, setUssdScreenText] = useState("");
   const [ussdInput, setUssdInput] = useState("");
@@ -21,7 +20,6 @@ export default function UssdSimulatorPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        // 1. Fetch current logged-in user
         const res = await fetch("/api/auth/me");
         if (!res.ok) {
           router.push("/");
@@ -30,7 +28,6 @@ export default function UssdSimulatorPage() {
         const userData = await res.json();
         setUser(userData.user);
 
-        // 2. Fetch user's circles to gather phone numbers of members to simulate
         const circlesRes = await fetch("/api/circles");
         if (circlesRes.ok) {
           const circlesData = await circlesRes.json();
@@ -38,14 +35,12 @@ export default function UssdSimulatorPage() {
 
           const allUsersMap = new Map<string, any>();
           
-          // Add logged-in user as the first option
           allUsersMap.set(userData.user.id, {
             id: userData.user.id,
             name: `${userData.user.name} (You)`,
             phone: userData.user.phone
           });
 
-          // Fetch detail for each circle to grab all member user info
           for (const c of circlesList) {
             try {
               const detailRes = await fetch(`/api/circles/${c.id}`);
@@ -71,7 +66,6 @@ export default function UssdSimulatorPage() {
           const mergedUsers = Array.from(allUsersMap.values());
           setSimUsers(mergedUsers);
           
-          // Default selection to logged-in user
           const defaultSim = mergedUsers.find((u) => u.id === userData.user.id) || mergedUsers[0];
           setSelectedSimUser(defaultSim);
         }
@@ -84,7 +78,6 @@ export default function UssdSimulatorPage() {
     loadData();
   }, [router]);
 
-  // --- USSD Emulator Functions ---
   const handleUssdDial = async () => {
     if (!selectedSimUser) return;
     setUssdSessionText("");
@@ -117,7 +110,6 @@ export default function UssdSimulatorPage() {
     if (e) e.preventDefault();
     if (!isUssdActive || isUssdEnding || !selectedSimUser) return;
 
-    // Append new input to session string
     const nextSessionText = ussdSessionText === "" ? ussdInput : `${ussdSessionText}*${ussdInput}`;
     setUssdSessionText(nextSessionText);
     setUssdInput("");
@@ -193,17 +185,14 @@ export default function UssdSimulatorPage() {
 
   return (
     <div className="flex-grow flex flex-col relative overflow-hidden bg-warm-linen min-h-screen">
-      {/* Ambient Drifting Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
         <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
         <div className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-terracotta/5 blur-[130px] animate-blob-3" />
       </div>
 
-      {/* Grain Texture Overlay */}
       <div className="grain-overlay" />
 
-      {/* Back to Dashboard Sticky Header */}
       <header className="sticky top-4 max-w-7xl mx-auto w-[calc(100%-2rem)] px-6 py-4 flex items-center justify-between z-50 glass-card rounded-2xl my-4">
         <div className="flex items-center gap-2">
           <button
@@ -226,10 +215,7 @@ export default function UssdSimulatorPage() {
         </div>
       </header>
 
-      {/* Main Workspace */}
       <main className="max-w-5xl mx-auto w-full px-6 py-8 md:py-16 flex-grow flex flex-col md:flex-row items-center justify-between gap-12 z-10">
-        
-        {/* Left Side: Instructions & Controller */}
         <div className="flex-1 space-y-6 max-w-lg">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-naira-green-light text-naira-green font-display font-semibold text-xs mb-4 border border-naira-green/10 shadow-sm">
@@ -243,7 +229,6 @@ export default function UssdSimulatorPage() {
             </p>
           </div>
 
-          {/* Quick reference guide */}
           <div className="glass-card rounded-2xl p-5 border border-white/50 shadow-md">
             <h3 className="font-display font-bold text-xs text-charcoal mb-3 flex items-center gap-1.5 uppercase tracking-wider">
               <HelpCircle size={14} className="text-naira-gold" /> Dialing Code Guide
@@ -272,7 +257,6 @@ export default function UssdSimulatorPage() {
             </ul>
           </div>
 
-          {/* Phone Selector Card */}
           <div className="glass-card rounded-2xl p-5 border border-white/50 shadow-md">
             <label className="block text-[10px] font-bold uppercase tracking-wider text-charcoal/60 mb-2">Simulate Active User phone number</label>
             <select
@@ -281,7 +265,6 @@ export default function UssdSimulatorPage() {
                 const selected = simUsers.find((u) => u.id === e.target.value);
                 if (selected) {
                   setSelectedSimUser(selected);
-                  // Reset simulator screen if changing user
                   setIsUssdActive(false);
                   setUssdSessionText("");
                   setUssdScreenText("");
@@ -301,21 +284,16 @@ export default function UssdSimulatorPage() {
           </div>
         </div>
 
-        {/* Right Side: Nokia Phone emulator */}
         <div className="flex-1 w-full max-w-[280px] flex justify-center">
           <div className="w-full aspect-[1/2] rounded-[48px] bg-gradient-to-b from-[#2d3035] to-[#121416] p-4.5 shadow-2xl flex flex-col justify-between border-4 border-charcoal/80 relative overflow-hidden group transition-all duration-500 hover:shadow-naira-green/5">
-            {/* Ambient indicator LED light */}
             <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#121416] rounded-full" />
 
-            {/* Screen Container */}
             <div className="flex-grow flex-shrink-0 aspect-[4/3] bg-gradient-to-b from-[#8da08d] to-[#7f917f] rounded-2xl p-4 font-mono text-xs text-[#171b17] relative overflow-hidden flex flex-col justify-between border border-black/25 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] min-h-[160px] mt-2">
-              {/* Screen Header */}
               <div className="border-b border-[#1e231e]/20 pb-1 flex justify-between items-center text-[9px] font-bold opacity-80 select-none">
                 <span>{selectedSimUser?.name.split(" ")[0] || "SIM"}</span>
                 <span className="flex items-center gap-0.5"><Hash size={8} /> 4G</span>
               </div>
 
-              {/* Screen Content */}
               <div className="flex-grow py-3.5 overflow-y-auto leading-tight text-[11px] whitespace-pre-wrap select-text pr-0.5">
                 {isUssdActive ? (
                   ussdScreenText
@@ -328,7 +306,6 @@ export default function UssdSimulatorPage() {
                 )}
               </div>
 
-              {/* Screen Input / Prompt area */}
               {isUssdActive && !isUssdEnding && (
                 <div className="border-t border-[#1e231e]/20 pt-1 flex gap-1 items-center">
                   <span className="opacity-60 font-bold select-none">&gt;</span>
@@ -362,14 +339,11 @@ export default function UssdSimulatorPage() {
               )}
             </div>
 
-            {/* Keypad controls */}
             <div className="mt-4 grid grid-cols-3 gap-2.5 text-center text-white flex-grow-0 select-none">
-              {/* Controls */}
               <button onClick={() => handleUssdKeypress("SEND")} className="py-3 rounded-xl bg-naira-green hover:bg-naira-green/85 hover:scale-105 active:scale-95 text-white font-bold text-[10px] shadow-md border border-naira-green/10 transition-all cursor-pointer">SEND</button>
               <button onClick={() => handleUssdKeypress("CLEAR")} className="py-3 rounded-xl bg-terracotta hover:bg-terracotta/85 hover:scale-105 active:scale-95 text-white font-bold text-[10px] shadow-md border border-terracotta/10 transition-all cursor-pointer">CLEAR</button>
               <button onClick={() => handleUssdKeypress("BACK")} className="py-3 rounded-xl bg-white/10 hover:bg-white/15 hover:scale-105 active:scale-95 text-white/80 font-bold text-[10px] shadow-md border border-white/5 transition-all cursor-pointer">BACK</button>
               
-              {/* Digits */}
               {["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"].map((k) => (
                 <button
                   key={k}
@@ -388,7 +362,6 @@ export default function UssdSimulatorPage() {
         </div>
       </main>
 
-      {/* Mini Footer */}
       <footer className="py-8 text-center text-charcoal/30 text-xs z-10 mt-auto">
         <p>&copy; {new Date().getFullYear()} AjoCircles. Simulated Gateway Node.</p>
       </footer>

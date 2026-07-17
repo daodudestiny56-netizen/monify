@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const rawBody = await req.text();
     const signature = req.headers.get("monnify-signature") || "";
 
-    // 1. Verify Webhook Signature
     const isSignatureValid = verifyWebhookSignature(signature, rawBody);
     if (!isSignatureValid) {
       console.warn("Unauthorized webhook payload: signature mismatch");
@@ -20,7 +19,6 @@ export async function POST(req: Request) {
 
     const { eventType, eventData } = payload;
 
-    // We only process successful transaction events
     if (eventType !== "SUCCESSFUL_TRANSACTION") {
       return NextResponse.json({ message: "Event type ignored." }, { status: 200 });
     }
@@ -31,11 +29,9 @@ export async function POST(req: Request) {
 
     const { transactionReference, amountPaid } = eventData;
     
-    // Find CircleMember by reserved account number or transaction reference
     let circleId: string | null = null;
     let memberId: string | null = null;
 
-    // Method A: Lookup by account number
     const accountNumber = eventData.destinationAccountPaymentInformation?.accountNumber;
     if (accountNumber) {
       const member = await prisma.circleMember.findFirst({
@@ -47,8 +43,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Method B: Fallback to parsing product reference if available
-    const productRef = eventData.product?.reference; // e.g. ref_[memberId]_[circleId]
+    const productRef = eventData.product?.reference;
     if ((!circleId || !memberId) && productRef && productRef.startsWith("ref_")) {
       const parts = productRef.split("_");
       if (parts.length >= 3) {
@@ -65,7 +60,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch the circle to get the current cycle number
     const circle = await prisma.circle.findUnique({
       where: { id: circleId }
     });
@@ -81,7 +75,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Confirm the contribution payment!
     const result = await confirmContributionPayment({
       circleId,
       memberId,

@@ -7,17 +7,11 @@ import {
   Users, 
   Landmark, 
   Wallet, 
-  TrendingUp, 
   LogOut, 
   Copy, 
   Check, 
-  HelpCircle, 
   Play, 
   Phone,
-  Settings,
-  Calendar,
-  AlertCircle,
-  Hash,
   Layers,
   ArrowRight
 } from "lucide-react";
@@ -29,19 +23,16 @@ export default function DashboardPage() {
   const [selectedCircleId, setSelectedCircleId] = useState<string | null>(null);
   const [circleDetail, setCircleDetail] = useState<any>(null);
   
-  // Modals & form states
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [isCryptoOpen, setIsCryptoOpen] = useState(false);
   
-  // Create Circle Form
   const [createName, setCreateName] = useState("");
   const [createAmount, setCreateAmount] = useState("");
   const [createFrequency, setCreateFrequency] = useState("WEEKLY");
   const [createMembers, setCreateMembers] = useState("4");
   const [createOrderType, setCreateOrderType] = useState("FIXED");
   
-  // Join Circle Form
   const [joinCode, setJoinCode] = useState("");
 
   const [loading, setLoading] = useState(true);
@@ -50,12 +41,8 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
-  // (USSD Simulator state removed to separate page)
-
-  // Poll intervals
   const pollTimerRef = useRef<any>(null);
 
-  // Check auth & fetch user's circles on load
   useEffect(() => {
     async function loadData() {
       try {
@@ -67,7 +54,6 @@ export default function DashboardPage() {
         const data = await res.json();
         setUser(data.user);
 
-        // Fetch user's circles
         const circlesRes = await fetch("/api/circles");
         if (circlesRes.ok) {
           const circlesData = await circlesRes.json();
@@ -101,11 +87,9 @@ export default function DashboardPage() {
     }
   }, [selectedCircleId]);
 
-  // Fetch selected circle details
   useEffect(() => {
     fetchCircleDetails();
     
-    // Set up auto-polling for real-time payment webhook updates (every 5 seconds)
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     pollTimerRef.current = setInterval(fetchCircleDetails, 5000);
 
@@ -114,7 +98,6 @@ export default function DashboardPage() {
     };
   }, [selectedCircleId, fetchCircleDetails]);
 
-  // Handle Logout
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -124,7 +107,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Handle Create Circle
   const handleCreateCircle = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -148,12 +130,10 @@ export default function DashboardPage() {
         throw new Error(data.error || "Failed to create circle");
       }
 
-      // Add to list and select
       setCircles((prev) => [...prev, data.circle]);
       setSelectedCircleId(data.circle.id);
       setIsCreateOpen(false);
       
-      // Reset form
       setCreateName("");
       setCreateAmount("");
       setCreateFrequency("WEEKLY");
@@ -166,7 +146,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Handle Join Circle
   const handleJoinCircle = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -184,7 +163,6 @@ export default function DashboardPage() {
         throw new Error(data.error || "Failed to join circle");
       }
 
-      // Refresh circles
       const circlesRes = await fetch("/api/circles");
       if (circlesRes.ok) {
         const circlesData = await circlesRes.json();
@@ -201,7 +179,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Manual payment override (for admin)
   const handleManualOverride = async (memberId: string, cycleNumber: number) => {
     try {
       const res = await fetch(`/api/circles/${selectedCircleId}/manual-pay`, {
@@ -211,7 +188,6 @@ export default function DashboardPage() {
       });
 
       if (res.ok) {
-        // Trigger immediate details reload
         const detailsRes = await fetch(`/api/circles/${selectedCircleId}`);
         if (detailsRes.ok) {
           const data = await detailsRes.json();
@@ -226,23 +202,19 @@ export default function DashboardPage() {
     }
   };
 
-  // Copy Clipboard Helper
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedText(label);
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  // (USSD Simulator functions moved to separate page)
-
-  // Mock a Webhook Payment for Demo
   const triggerMockPaymentWebhook = async (memberAccountNumber: string, amount: number) => {
     try {
       const res = await fetch("/api/webhooks/monnify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "monnify-signature": "mock_valid_signature_for_sandbox" // Mock passed on sandbox env
+          "monnify-signature": "mock_valid_signature_for_sandbox"
         },
         body: JSON.stringify({
           eventType: "SUCCESSFUL_TRANSACTION",
@@ -259,7 +231,6 @@ export default function DashboardPage() {
       const data = await res.json();
       if (res.ok) {
         alert("Payment Success Webhook simulation fired!");
-        // Refresh details
         if (selectedCircleId) {
           const detailRes = await fetch(`/api/circles/${selectedCircleId}`);
           if (detailRes.ok) {
@@ -283,7 +254,6 @@ export default function DashboardPage() {
     );
   }
 
-  // Trigonometry layout for Payout Wheel
   const renderPayoutWheel = () => {
     if (!circleDetail || !circleDetail.members || circleDetail.members.length === 0) return null;
 
@@ -293,19 +263,14 @@ export default function DashboardPage() {
     const height = 320;
     const cx = width / 2;
     const cy = height / 2;
-    const r = 100; // Ring radius
+    const r = 100;
 
-    // Find current recipient index in the members list
     const currentRecipientId = circleDetail.circle.currentRecipientId;
-    const currentRecipientIndex = members.findIndex((m: any) => m.id === currentRecipientId);
-
-    // Calculate details for central progress text
     const activeContributions = circleDetail.currentCycleContributions || [];
     const paidCount = activeContributions.filter((c: any) => c.status === "PAID").length;
     const totalAmount = circleDetail.circle.contributionAmount * circleDetail.circle.memberCount;
     const paidAmount = circleDetail.circle.contributionAmount * paidCount;
     
-    // SVG segments to show money fill level
     const progressPercentage = (paidCount / n) * 100;
     const circumference = 2 * Math.PI * r;
     const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
@@ -313,7 +278,6 @@ export default function DashboardPage() {
     return (
       <div className="relative flex items-center justify-center select-none">
         <svg width={width} height={height} className="overflow-visible">
-          {/* Defs for gradients & shadow effects */}
           <defs>
             <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
               <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.08" />
@@ -324,7 +288,6 @@ export default function DashboardPage() {
             </linearGradient>
           </defs>
 
-          {/* Background Ring */}
           <circle 
             cx={cx} 
             cy={cy} 
@@ -334,7 +297,6 @@ export default function DashboardPage() {
             strokeWidth="8"
           />
 
-          {/* Foreground Active Green Shimmer Fill Segment */}
           <circle 
             cx={cx} 
             cy={cy} 
@@ -349,7 +311,6 @@ export default function DashboardPage() {
             transform={`rotate(-90 ${cx} ${cy})`}
           />
 
-          {/* Draw connection pathways */}
           {members.map((m: any, i: number) => {
             const nextIdx = (i + 1) % n;
             const theta1 = (2 * Math.PI * i) / n - Math.PI / 2;
@@ -374,18 +335,15 @@ export default function DashboardPage() {
             );
           })}
 
-          {/* Draw nodes representing each member */}
           {members.map((m: any, i: number) => {
             const theta = (2 * Math.PI * i) / n - Math.PI / 2;
             const x = cx + r * Math.cos(theta);
             const y = cy + r * Math.sin(theta);
             
-            // Check if paid in the current cycle
             const memberContribution = activeContributions.find((c: any) => c.memberId === m.id);
             const hasPaid = memberContribution?.status === "PAID";
             const isRecipient = m.id === currentRecipientId;
 
-            // Short initials
             const initials = m.user.name
               .split(" ")
               .map((word: string) => word[0])
@@ -395,7 +353,6 @@ export default function DashboardPage() {
 
             return (
               <g key={`node-${m.id}`} filter="url(#shadow)" className="cursor-pointer">
-                {/* Node circle */}
                 <circle
                   cx={x}
                   cy={y}
@@ -405,7 +362,6 @@ export default function DashboardPage() {
                   strokeWidth={isRecipient ? "3" : "2"}
                 />
                 
-                {/* Initials Label */}
                 <text
                   x={x}
                   y={y + 4}
@@ -416,7 +372,6 @@ export default function DashboardPage() {
                   {initials}
                 </text>
 
-                {/* Micro outer rings for states */}
                 {isRecipient && (
                   <circle
                     cx={x}
@@ -430,7 +385,6 @@ export default function DashboardPage() {
                   />
                 )}
                 
-                {/* Name tooltip text drawn nearby */}
                 <text
                   x={x}
                   y={y + (y > cy ? 38 : -32)}
@@ -445,7 +399,6 @@ export default function DashboardPage() {
           })}
         </svg>
 
-        {/* Center overlay container for summary */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 pointer-events-none">
           <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-widest">Active Cycle Pot</span>
           <div className="font-display font-extrabold text-2xl text-naira-green mt-0.5">
@@ -465,20 +418,16 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-grow flex flex-col md:flex-row min-h-screen bg-warm-linen relative overflow-hidden">
-      {/* Ambient Drifting Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
         <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
         <div className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-terracotta/5 blur-[130px] animate-blob-3" />
       </div>
 
-      {/* Grain Texture Overlay */}
       <div className="grain-overlay" />
 
-      {/* Left panel: Circle overview & selector */}
       <aside className="w-full md:w-64 border-r border-charcoal/5 flex flex-col justify-between p-6 bg-white/35 backdrop-blur-xl z-20">
         <div>
-          {/* Logo */}
           <div className="flex items-center gap-2 mb-8 transition-transform duration-300 hover:scale-[1.02]">
             <div className="w-8 h-8 rounded-lg bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/10">
               <span className="font-display font-extrabold text-sm">₦</span>
@@ -486,7 +435,6 @@ export default function DashboardPage() {
             <span className="font-display font-bold text-md text-charcoal">Ajo<span className="text-naira-green">Circles</span></span>
           </div>
 
-          {/* User Profile */}
           <div className="bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-white/50 mb-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-naira-green text-white font-display font-bold flex items-center justify-center shadow-sm">
@@ -499,7 +447,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Circle List Header */}
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-bold text-charcoal/40 uppercase tracking-widest">My Circles</span>
             <div className="flex gap-1.5">
@@ -520,7 +467,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Circle Selector List */}
           <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
             {circles.length === 0 ? (
               <p className="text-xs text-charcoal/40 italic text-center py-4">No circles joined yet.</p>
@@ -548,7 +494,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* USSD Simulator Navigation Link */}
           <div className="mt-8 border-t border-charcoal/5 pt-4">
             <button
               onClick={() => router.push("/ussd-simulator")}
@@ -567,7 +512,6 @@ export default function DashboardPage() {
         </button>
       </aside>
 
-      {/* Center panel: Circle details & payout wheel */}
       <main className="flex-1 flex flex-col p-6 md:p-8 z-20 overflow-y-auto">
         {detailLoading && !circleDetail ? (
           <div className="flex-1 flex flex-col items-center justify-center">
@@ -600,7 +544,6 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Dashboard Header Banner */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-charcoal/5 pb-5">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
@@ -613,7 +556,6 @@ export default function DashboardPage() {
                 <h2 className="font-display font-extrabold text-2xl text-charcoal">{circleDetail.circle.name}</h2>
               </div>
 
-              {/* Invite Code Clipboard */}
               <div className="flex items-center gap-2">
                 <div className="glass-card rounded-2xl p-3 shadow-md border border-white/60 flex items-center gap-3 transition-all hover:scale-[1.01]">
                   <div className="text-right">
@@ -630,9 +572,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Core Row: Payout Wheel and Bank info */}
             <div className="grid lg:grid-cols-12 gap-6 items-start">
-              {/* Central Box for Payout Wheel */}
               <div className="lg:col-span-7 glass-card rounded-3xl p-6 shadow-md border border-white/50 flex flex-col items-center transition-all hover:shadow-lg">
                 <div className="w-full flex items-center justify-between mb-4">
                   <h3 className="font-display font-bold text-sm text-charcoal">Payout Rotation</h3>
@@ -643,9 +583,7 @@ export default function DashboardPage() {
                 {renderPayoutWheel()}
               </div>
 
-              {/* Right Box for Bank Details & Teasers */}
               <div className="lg:col-span-5 space-y-6">
-                {/* Bank Reserved Account Card */}
                 {circleDetail.myMemberId && (
                   <div className="bg-gradient-to-br from-charcoal/95 to-[#1c1f24] backdrop-blur-xl rounded-3xl p-6 text-white shadow-xl border border-white/10 relative overflow-hidden group">
                     <div className="absolute top-[-40px] right-[-40px] w-24 h-24 rounded-full bg-white/5 filter blur-md"></div>
@@ -654,7 +592,6 @@ export default function DashboardPage() {
                       <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">My Virtual Reserved Account</span>
                     </div>
 
-                    {/* Account Details */}
                     {(() => {
                       const myMember = circleDetail.members.find((m: any) => m.id === circleDetail.myMemberId);
                       if (!myMember?.monnifyReservedAccountNumber) {
@@ -699,7 +636,6 @@ export default function DashboardPage() {
                             </p>
                           </div>
                           
-                          {/* Developer Webhook Trigger Sandbox Helper */}
                           <div className="border-t border-white/5 pt-3.5 flex gap-2">
                             <button
                               onClick={() => triggerMockPaymentWebhook(myMember.monnifyReservedAccountNumber, circleDetail.circle.contributionAmount)}
@@ -714,7 +650,6 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {/* Crypto Affordance roadmap teaser */}
                 <button
                   onClick={() => setIsCryptoOpen(true)}
                   className="w-full p-4 rounded-2xl glass-card border border-white/50 shadow-md hover:border-naira-green/30 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 flex items-center justify-between text-left cursor-pointer"
@@ -733,7 +668,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Bottom Row: Member payment status list */}
             <div className="glass-card rounded-3xl p-6 border border-white/50 shadow-md transition-all hover:shadow-lg">
               <h3 className="font-display font-bold text-sm mb-4 text-charcoal">Circle Members Payment Status</h3>
               
@@ -781,7 +715,6 @@ export default function DashboardPage() {
                             )}
                           </td>
                           <td className="py-3.5 text-right">
-                            {/* Manual Admin Override: Show if admin, contribution is pending, and circle is active */}
                             {isCircleAdmin && !isPaid && circleDetail.circle.status === "ACTIVE" && (
                               <button
                                 onClick={() => handleManualOverride(m.id, circleDetail.circle.currentCycleNumber)}
@@ -802,9 +735,6 @@ export default function DashboardPage() {
         )}
       </main>
 
-      {/* --- MODAL DIALOGS --- */}
-
-      {/* Create Circle Modal */}
       {isCreateOpen && (
         <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
@@ -901,7 +831,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Join Circle Modal */}
       {isJoinOpen && (
         <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">
@@ -944,7 +873,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Crypto Affordance roadmap teaser */}
       {isCryptoOpen && (
         <div className="fixed inset-0 bg-charcoal/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white/85 backdrop-blur-xl rounded-3xl w-full max-w-md p-8 border border-white/60 shadow-2xl relative animate-fade-in-up">

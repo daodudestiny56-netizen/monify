@@ -33,11 +33,9 @@ interface ReservedAccountResponse {
   };
 }
 
-// Memory cache for Monnify Auth Token
 let cachedToken: string | null = null;
 let tokenExpiryTime: number = 0;
 
-// Authenticate with Monnify and get Access Token
 async function getAccessToken(): Promise<string | null> {
   if (!MONNIFY_API_KEY || !MONNIFY_SECRET_KEY) {
     console.warn("Monnify API Key or Secret Key is not configured. Running in MOCK mode.");
@@ -68,7 +66,6 @@ async function getAccessToken(): Promise<string | null> {
     const data = (await response.json()) as TokenResponse;
     if (data.requestSuccessful) {
       cachedToken = data.responseBody.accessToken;
-      // Expire 1 minute early for safety
       tokenExpiryTime = now + (data.responseBody.expiresIn - 60) * 1000;
       return cachedToken;
     }
@@ -78,7 +75,6 @@ async function getAccessToken(): Promise<string | null> {
   return null;
 }
 
-// 1. Create Reserved Account for a Member in a Circle
 export async function createReservedAccount(params: {
   memberId: string;
   memberName: string;
@@ -93,10 +89,8 @@ export async function createReservedAccount(params: {
 
   const token = await getAccessToken();
   
-  // If no credentials, operate in Mock/Stub Mode
   if (!token) {
     console.log(`[MONNIFY MOCK] Provisioning reserved virtual account for Member ${memberId} in Circle ${circleId}`);
-    // Return realistic Wema Bank mock account details
     const mockAccountNumber = "992" + Math.floor(1000000 + Math.random() * 9000000).toString();
     return {
       success: true,
@@ -151,10 +145,8 @@ export async function createReservedAccount(params: {
   }
 }
 
-// 2. Webhook Signature Verification
 export function verifyWebhookSignature(signature: string, requestBody: string): boolean {
   if (!MONNIFY_SECRET_KEY) {
-    // If running in development without keys, allow all signatures for ease of mock testing
     console.warn("MONNIFY_SECRET_KEY is not set. Webhook signature verification is MOCK-PASSED.");
     return true;
   }
@@ -170,7 +162,6 @@ export function verifyWebhookSignature(signature: string, requestBody: string): 
   }
 }
 
-// 3. Trigger Disbursement
 export async function triggerDisbursement(params: {
   payoutId: string;
   circleName: string;
@@ -194,7 +185,7 @@ export async function triggerDisbursement(params: {
   const token = await getAccessToken();
 
   if (!token) {
-    console.log(`[MONNIFY MOCK] Single single-disbursement triggered:
+    console.log(`[MONNIFY MOCK] Single disbursement triggered:
       Payout ID: ${payoutId}
       Amount: NGN ${amount}
       To Account: ${destinationAccountNumber} (${destinationAccountName}) at Bank Code: ${destinationBankCode}
@@ -231,7 +222,7 @@ export async function triggerDisbursement(params: {
       return {
         success: true,
         transactionReference: data.responseBody.transactionReference,
-        status: data.responseBody.status, // SUCCESS, PENDING, FAILED
+        status: data.responseBody.status,
       };
     } else {
       console.error("Monnify disbursement failed:", data.responseMessage);

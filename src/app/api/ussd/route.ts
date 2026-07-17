@@ -2,21 +2,17 @@ import { prisma } from "@/lib/db";
 import { comparePin } from "@/lib/auth";
 import { createReservedAccount } from "@/services/monify";
 
-// Helper to normalize Nigerian phone numbers to match database (e.g. +234803... or 803... to 0803...)
 function normalizePhone(phone: string): string {
   const cleaned = phone.trim().replace(/\D/g, "");
-  // If starts with 234, replace with 0
   if (cleaned.startsWith("234") && cleaned.length > 10) {
     return "0" + cleaned.slice(3);
   }
-  // If doesn't start with 0 and is 10 digits (e.g. 8031234567), prepand 0
   if (!cleaned.startsWith("0") && cleaned.length === 10) {
     return "0" + cleaned;
   }
   return cleaned;
 }
 
-// Helper to shuffle an array (for USSD circle fill auto-start)
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -28,7 +24,6 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export async function POST(req: Request) {
   try {
-    // Africa's Talking POSTs as x-www-form-urlencoded
     const contentType = req.headers.get("content-type") || "";
     let sessionId = "";
     let phoneNumber = "";
@@ -40,7 +35,6 @@ export async function POST(req: Request) {
       phoneNumber = formData.get("phoneNumber")?.toString() || "";
       text = formData.get("text")?.toString() || "";
     } else {
-      // Fallback for JSON requests (like our simulator)
       const body = await req.json();
       sessionId = body.sessionId || "";
       phoneNumber = body.phoneNumber || "";
@@ -50,7 +44,6 @@ export async function POST(req: Request) {
     const dbPhone = normalizePhone(phoneNumber);
     console.log(`USSD Session ${sessionId}: phone=${phoneNumber} -> dbPhone=${dbPhone}, text="${text}"`);
 
-    // 1. Fetch user by phone
     const user = await prisma.user.findUnique({
       where: { phone: dbPhone }
     });
@@ -64,14 +57,11 @@ export async function POST(req: Request) {
     const parts = text === "" ? [] : text.split("*");
     const mainOption = parts[0];
 
-    // --- MAIN MENU ---
     if (parts.length === 0) {
       const menu = `CON Welcome to AjoCircles, ${user.name}!\nChoose an option:\n1. Join a Circle\n2. Check My Status\n3. My Circles\n4. Pay Now`;
       return new Response(menu, { headers: { "Content-Type": "text/plain" } });
     }
 
-    // --- OPTION 1: JOIN A CIRCLE ---
-    // Flow: 1 -> invite code -> PIN
     if (mainOption === "1") {
       if (parts.length === 1) {
         return new Response("CON Enter circle invite code:", { headers: { "Content-Type": "text/plain" } });
@@ -85,13 +75,11 @@ export async function POST(req: Request) {
         const inviteCode = parts[1].trim().toUpperCase();
         const pin = parts[2].trim();
 
-        // Verify PIN
         const isPinValid = await comparePin(pin, user.pinHash);
         if (!isPinValid) {
           return new Response("END Invalid PIN. Session closed.", { headers: { "Content-Type": "text/plain" } });
         }
 
-        // Fetch Circle
         const circle = await prisma.circle.findUnique({
           where: { inviteCode },
           include: {
@@ -107,13 +95,11 @@ export async function POST(req: Request) {
           return new Response("END This circle is no longer active.", { headers: { "Content-Type": "text/plain" } });
         }
 
-        // Check if already a member
         const alreadyMember = circle.members.some((m) => m.userId === user.id);
         if (alreadyMember) {
           return new Response("END You are already a member of this circle.", { headers: { "Content-Type": "text/plain" } });
         }
 
-        // Check if full
         if (circle.members.length >= circle.memberCount) {
           return new Response("END This circle is already full.", { headers: { "Content-Type": "text/plain" } });
         }
@@ -121,7 +107,6 @@ export async function POST(req: Request) {
         const currentMemberIndex = circle.members.length;
         const isNowFull = currentMemberIndex + 1 === circle.memberCount;
 
-        // Perform Join in Transaction
         const joinResult = await prisma.$transaction(async (tx) => {
           const newMember = await tx.circleMember.create({
             data: {
@@ -160,7 +145,6 @@ export async function POST(req: Request) {
               }
             });
 
-            // Initialize Cycle 1 Contributions
             const contributionPromises = allMembers.map((member) => {
               return tx.contribution.create({
                 data: {
@@ -186,7 +170,6 @@ export async function POST(req: Request) {
           return newMember;
         });
 
-        // Provision reserved account
         const reservedAccountResult = await createReservedAccount({
           memberId: joinResult.id,
           memberName: user.name,
@@ -216,8 +199,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // --- OPTION 2: CHECK MY STATUS ---
-    // Flow: 2 -> list circles -> select circle -> show details
     if (mainOption === "2") {
       const userMemberships = await prisma.circleMember.findMany({
         where: { userId: user.id },
@@ -245,7 +226,6 @@ export async function POST(req: Request) {
         const selectedMember = userMemberships[index];
         const circle = selectedMember.circle;
 
-        // Fetch contribution for current cycle
         const contribution = await prisma.contribution.findUnique({
           where: {
             circleId_memberId_cycleNumber: {
@@ -256,7 +236,6 @@ export async function POST(req: Request) {
           }
         });
 
-        // Determine recipient name
         let recipientName = "None";
         if (circle.currentRecipientId) {
           const recipientMember = await prisma.circleMember.findUnique({
@@ -275,8 +254,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // --- OPTION 3: MY CIRCLES ---
-    // Flow: 3
     if (mainOption === "3") {
       const userMemberships = await prisma.circleMember.findMany({
         where: { userId: user.id },
@@ -295,8 +272,6 @@ export async function POST(req: Request) {
       return new Response(responseText, { headers: { "Content-Type": "text/plain" } });
     }
 
-    // --- OPTION 4: PAY NOW ---
-    // Flow: 4 -> list circles -> select circle -> show payment account
     if (mainOption === "4") {
       const userMemberships = await prisma.circleMember.findMany({
         where: { userId: user.id },

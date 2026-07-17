@@ -1,12 +1,6 @@
 import { prisma } from "@/lib/db";
 import { triggerDisbursement } from "./monify";
 
-/**
- * Confirms a contribution payment, checks if the cycle is completed,
- * executes disbursement, and advances the cycle rotation.
- * 
- * This function is idempotent and signature-safe.
- */
 export async function confirmContributionPayment(params: {
   circleId: string;
   memberId: string;
@@ -16,7 +10,6 @@ export async function confirmContributionPayment(params: {
   const { circleId, memberId, cycleNumber, transactionRef } = params;
 
   return await prisma.$transaction(async (tx) => {
-    // 1. Fetch contribution
     const contribution = await tx.contribution.findUnique({
       where: {
         circleId_memberId_cycleNumber: {
@@ -28,7 +21,6 @@ export async function confirmContributionPayment(params: {
     });
 
     if (!contribution) {
-      // Check if circle has not started yet (members count < expected member count)
       const circle = await tx.circle.findUnique({
         where: { id: circleId },
         include: { members: true }
@@ -37,7 +29,7 @@ export async function confirmContributionPayment(params: {
       if (circle && circle.members.length < circle.memberCount) {
         return {
           success: false,
-          error: `Circle is waiting for more members to join (${circle.members.length}/${circle.memberCount}). Cycle 1 has not started yet.`,
+          error: `Circle is waiting for more members to join (${circle.members.length}/${circle.memberCount}).`,
           alreadyProcessed: false,
         };
       }
@@ -45,12 +37,10 @@ export async function confirmContributionPayment(params: {
       throw new Error(`Contribution not found for member ${memberId} in cycle ${cycleNumber}`);
     }
 
-    // Idempotency: if already paid, do nothing and return
     if (contribution.status === "PAID") {
       return { success: true, alreadyProcessed: true };
     }
 
-    // 2. Mark the contribution as PAID
     await tx.contribution.update({
       where: { id: contribution.id },
       data: {
@@ -60,7 +50,6 @@ export async function confirmContributionPayment(params: {
       }
     });
 
-    // 3. Fetch circle and all its members
     const circle = await tx.circle.findUnique({
       where: { id: circleId },
       include: {
@@ -76,7 +65,6 @@ export async function confirmContributionPayment(params: {
       throw new Error(`Circle ${circleId} not found`);
     }
 
-    // 4. Check if all contributions for the current cycle are now PAID
     const totalContributions = await tx.contribution.findMany({
       where: {
         circleId,
@@ -86,7 +74,6 @@ export async function confirmContributionPayment(params: {
 
     const unpaidCount = totalContributions.filter((c) => c.status !== "PAID").length;
 
-    // If there are still unpaid contributions, the cycle is not yet complete
     if (unpaidCount > 0) {
       return {
         success: true,
@@ -96,7 +83,6 @@ export async function confirmContributionPayment(params: {
       };
     }
 
-    // --- Cycle is fully funded! Trigger Payout ---
     const payoutOrder = Array.isArray(circle.payoutOrder)
       ? (circle.payoutOrder as string[])
       : [];
@@ -111,10 +97,8 @@ export async function confirmContributionPayment(params: {
       throw new Error(`Recipient member ${currentRecipientMemberId} not found in circle.`);
     }
 
-    // Calculate total pot amount (contribution * number of members)
     const potAmount = circle.contributionAmount * circle.memberCount;
 
-    // Create a Payout record
     const payout = await tx.payout.create({
       data: {
         circleId,
@@ -125,7 +109,6 @@ export async function confirmContributionPayment(params: {
       }
     });
 
-    // Determine destination bank details
     const destAccountNumber = recipientMember.user.payoutBankAccountNumber;
     const destBankCode = recipientMember.user.payoutBankCode;
     const destAccountName = recipientMember.user.name;
@@ -133,10 +116,9 @@ export async function confirmContributionPayment(params: {
     let disbursementResult = { success: false, transactionReference: null, status: "FAILED", error: "" };
 
     if (!destAccountNumber || !destBankCode) {
-      console.warn(`Payout recipient ${recipientMember.user.name} has no payout bank account set. Marking payout as FAILED (requires manual intervention).`);
+      console.warn(`Payout recipient ${recipientMember.user.name} has no payout bank account set.`);
       disbursementResult.error = "No payout bank details configured on user profile.";
     } else {
-      // Trigger Monnify single single-disbursement API
       const response = await triggerDisbursement({
         payoutId: payout.id,
         circleName: circle.name,
@@ -159,7 +141,6 @@ export async function confirmContributionPayment(params: {
       }
     }
 
-    // Update payout status based on disbursement API result
     await tx.payout.update({
       where: { id: payout.id },
       data: {
@@ -169,7 +150,6 @@ export async function confirmContributionPayment(params: {
       }
     });
 
-    // 5. Advance Cycle Rotation
     const currentRecipientIndex = payoutOrder.indexOf(currentRecipientMemberId);
     const nextRecipientIndex = currentRecipientIndex + 1;
     const hasNextCycle = nextRecipientIndex < payoutOrder.length;
@@ -178,7 +158,6 @@ export async function confirmContributionPayment(params: {
       const nextRecipientId = payoutOrder[nextRecipientIndex];
       const nextCycleNumber = cycleNumber + 1;
 
-      // Update Circle to next cycle
       await tx.circle.update({
         where: { id: circleId },
         data: {
@@ -187,7 +166,6 @@ export async function confirmContributionPayment(params: {
         }
       });
 
-      // Create new set of pending Contributions for the next cycle
       const nextContributions = circle.members.map((m) => {
         return tx.contribution.create({
           data: {
@@ -212,7 +190,6 @@ export async function confirmContributionPayment(params: {
         disbursementError: disbursementResult.error || null,
       };
     } else {
-      // No more cycles: the circle is completed!
       await tx.circle.update({
         where: { id: circleId },
         data: {
