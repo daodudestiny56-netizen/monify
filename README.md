@@ -85,7 +85,7 @@ The seed script generates 4 pre-registered users with a shared PIN **`1234`**:
 6. The app detects the payment, marks Chioma paid, completes the cycle, automatically triggers the Monnify disbursement to Funmi's personal account, and rotates to Cycle 3! Watch the SVG Payout Wheel animate and update in real-time.
 
 ### 3. USSD Dial Flow (Phone Emulator)
-On the right-hand side of the dashboard, you will find a virtual phone. 
+On the left-hand side of the dashboard, you will find a virtual phone. 
 - Ensure you select the active simulator user from the dropdown above the phone.
 - Dial by clicking **SEND**.
 - Keypad interactions:
