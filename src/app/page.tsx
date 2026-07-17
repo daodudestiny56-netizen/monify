@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CircleDollarSign, ShieldCheck, PhoneCall, ArrowRight, ArrowLeftRight, Landmark, Layers } from "lucide-react";
+import Image from "next/image";
+import { CircleDollarSign, ShieldCheck, Activity, ArrowRight, ArrowLeftRight, Landmark, Layers } from "lucide-react";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -128,12 +129,12 @@ export default function LandingPage() {
 
       <div className="grain-overlay" />
 
-      <header className="sticky top-4 max-w-7xl mx-auto w-[calc(100%-2rem)] px-6 py-4 flex items-center justify-between z-50 glass-card rounded-2xl my-4">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/20 transition-transform duration-355 hover:scale-105">
-            <span className="font-display font-extrabold text-xl tracking-tight">₦</span>
+      <header className="sticky top-4 max-w-7xl mx-auto w-[calc(100%-2rem)] px-6 py-4 flex items-center justify-between z-50 glass-card rounded-full my-4">
+        <div className="flex items-center gap-3 transition-transform duration-300 hover:scale-105 cursor-pointer">
+          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mix-blend-multiply">
+            <Image src="/logo.png" alt="AjoCircles Logo" width={80} height={80} className="w-full h-full object-cover scale-[1.7]" />
           </div>
-          <span className="font-display font-bold text-xl tracking-tight text-charcoal">Ajo<span className="text-naira-green">Circles</span></span>
+          <span className="font-display font-bold text-xl text-charcoal tracking-tight">AjoCircles</span>
         </div>
         
         <nav className="flex items-center gap-4">
@@ -145,20 +146,12 @@ export default function LandingPage() {
               Go to Dashboard <ArrowRight size={16} />
             </button>
           ) : (
-            <>
-              <button
-                onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
-                className="px-4 py-2 text-charcoal font-semibold hover:text-naira-green transition duration-300 cursor-pointer"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => setAuthModal({ isOpen: true, mode: "register" })}
-                className="px-5 py-2.5 bg-naira-green text-white font-semibold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-md shadow-naira-green/15 cursor-pointer"
-              >
-                Register
-              </button>
-            </>
+            <button
+              onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
+              className="px-6 py-2.5 bg-naira-green text-white font-semibold rounded-full hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-md shadow-naira-green/15 cursor-pointer"
+            >
+              Get Started
+            </button>
           )}
         </nav>
       </header>
@@ -175,7 +168,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-lg text-charcoal/80 leading-relaxed mb-8 animate-fade-in-up" style={{ animationDelay: '250ms', animationFillMode: 'both' }}>
-            Digitize your traditional rotating savings (Ajo/Esusu). Circle members contribute automatically, while payouts rotate securely via the Monnify API. Anyone can join, pay in, or monitor progress offline using our built-in **USSD flow**.
+            Digitize your traditional rotating savings (Ajo/Esusu). Circle members contribute automatically, while payouts rotate securely via the Monnify API. Anyone can join, pay in, or monitor progress instantly using our built-in **Monnify Sandbox Core**.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
@@ -206,7 +199,7 @@ export default function LandingPage() {
         </div>
 
         <div className="flex-grow flex-1 w-full max-w-lg lg:max-w-none flex justify-center animate-fade-in-up" style={{ animationDelay: '550ms', animationFillMode: 'both' }}>
-          <div className="relative w-full aspect-square max-w-[420px] rounded-3xl glass-card p-6 shadow-xl flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-naira-green/5 group">
+          <div className="relative w-full min-h-[460px] max-w-[420px] rounded-3xl glass-card p-6 sm:p-8 shadow-xl flex flex-col justify-between overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-naira-green/5 group gap-4">
             <div className="absolute inset-0 bg-radial from-naira-green/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
             <div className="flex items-center justify-between border-b border-charcoal/5 pb-4 z-10">
@@ -219,34 +212,79 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex-grow flex items-center justify-center py-6 relative z-10">
-              <div className="w-56 h-56 rounded-full border-[6px] border-charcoal/5 relative flex items-center justify-center bg-white/20 backdrop-blur-sm shadow-inner">
-                <div className="absolute inset-[-6px] rounded-full border-[6px] border-transparent border-t-naira-green border-r-naira-green rotate-45 animate-[spin_12s_linear_infinite]"></div>
+            <div className="flex-grow flex items-center justify-center py-8 relative z-10">
+              <div className="w-56 h-56 relative flex items-center justify-center">
+                {/* SVG Progress Circle */}
+                <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md" viewBox="0 0 100 100">
+                  <defs>
+                    <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#0D5C3A" />
+                      <stop offset="100%" stopColor="#2BB877" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="46"
+                    fill="none"
+                    stroke="rgba(0,0,0,0.04)"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="46"
+                    fill="none"
+                    stroke="url(#progress-gradient)"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeDasharray="289"
+                    strokeDashoffset="72.25"
+                    className="wheel-progress-transition"
+                  />
+                </svg>
                 
-                <div className="text-center z-10 px-4">
-                  <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-wider block">Total Pot</span>
-                  <div className="font-display font-extrabold text-2xl text-naira-green mt-1 tabular-numbers">₦40,000</div>
-                  <span className="text-[11px] font-medium text-charcoal/60 mt-1 block">3 of 4 paid this week</span>
+                {/* Center Content */}
+                <div className="text-center z-10 px-4 flex flex-col items-center">
+                  <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-widest block mb-1">Total Pot</span>
+                  <div className="font-display font-black text-3xl text-naira-green tracking-tight tabular-numbers drop-shadow-sm">₦40,000</div>
+                  <span className="text-[11px] font-semibold text-charcoal/60 mt-2 bg-charcoal/5 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-naira-green animate-pulse"></span>
+                    3 of 4 paid this week
+                  </span>
                 </div>
 
-                <div className="absolute top-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">CO</div>
-                <div className="absolute right-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">FA</div>
-                <div className="absolute bottom-[-14px] bg-naira-green text-white font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-2 border-white transition-all duration-300 hover:scale-110">IM</div>
-                <div className="absolute left-[-14px] bg-naira-gold-light border-2 border-naira-gold text-naira-gold font-bold w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md transition-all duration-300 hover:scale-110 animate-[pulse_2.5s_infinite]">CN</div>
+                {/* Nodes - Positioned using exact percentages */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-110 transition-transform cursor-pointer">CO</div>
+                
+                <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-110 transition-transform cursor-pointer">FA</div>
+                
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-110 transition-transform cursor-pointer">IM</div>
+                
+                <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-[#FFF8E7] to-[#FFE8B3] border-2 border-white text-naira-gold font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_0_20px_rgba(229,169,60,0.4)] z-20 hover:scale-110 transition-transform cursor-pointer relative animate-node-pulse">
+                  <div className="absolute inset-0 rounded-full border-2 border-naira-gold/50 animate-[ping_2s_ease-out_infinite] opacity-50 scale-150"></div>
+                  <span className="relative z-10">CN</span>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-white/60 flex items-center justify-between z-10 shadow-sm">
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex items-center justify-between z-10 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer group">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-naira-green-light flex items-center justify-center text-naira-green">
+                <div className="w-9 h-9 rounded-full bg-naira-green-light flex items-center justify-center text-naira-green group-hover:scale-110 transition-transform">
                   <Landmark size={16} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-charcoal">Wema Bank (Reserved)</h4>
-                  <p className="text-[10px] font-mono text-charcoal/60 font-bold">9921029384</p>
+                  <h4 className="text-[13px] font-bold text-charcoal leading-tight mb-0.5">Wema Bank (Reserved)</h4>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-naira-green animate-pulse"></div>
+                    <p className="text-[11px] font-mono text-charcoal/50 font-bold tracking-widest">9921029384</p>
+                  </div>
                 </div>
               </div>
-              <span className="text-xs font-semibold text-naira-green bg-naira-green-light px-2.5 py-1 rounded-lg border border-naira-green/5 tabular-numbers">₦10,000 / member</span>
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-wider mb-0.5">Contribution</span>
+                <span className="text-xs font-bold text-naira-green bg-naira-green-light/80 px-2.5 py-1 rounded-lg border border-naira-green/10 tabular-numbers">₦10,000</span>
+              </div>
             </div>
           </div>
         </div>
@@ -287,11 +325,11 @@ export default function LandingPage() {
             <div className="glass-card-dark rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group flex flex-col justify-between min-h-[220px]">
               <div>
                 <div className="w-12 h-12 rounded-xl bg-naira-gold/10 text-naira-gold flex items-center justify-center mb-6 border border-naira-gold/20 group-hover:scale-110 transition-transform duration-300">
-                  <PhoneCall size={24} />
+                  <Activity size={24} />
                 </div>
-                <h3 className="font-display font-bold text-lg mb-3">Feature Phone USSD Menu</h3>
+                <h3 className="font-display font-bold text-lg mb-3">Real-time Webhook Events</h3>
                 <p className="text-white/60 leading-relaxed text-sm">
-                  Members without smartphones can dial <code className="text-naira-gold font-mono bg-white/10 px-1.5 py-0.5 rounded">*384*TRADER#</code> to join, check contribution deadlines, view recipient rotation, and see payout bank details.
+                  Instant transaction detection via Monnify Webhooks. As soon as a member completes a transfer, the cycle progress bar updates and confirms payment instantly.
                 </p>
               </div>
             </div>

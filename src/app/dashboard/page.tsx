@@ -15,6 +15,8 @@ import {
   Layers,
   ArrowRight
 } from "lucide-react";
+import Image from "next/image";
+import PayoutWheel from "@/components/PayoutWheel";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -254,168 +256,6 @@ export default function DashboardPage() {
     );
   }
 
-  const renderPayoutWheel = () => {
-    if (!circleDetail || !circleDetail.members || circleDetail.members.length === 0) return null;
-
-    const members = circleDetail.members;
-    const n = members.length;
-    const width = 320;
-    const height = 320;
-    const cx = width / 2;
-    const cy = height / 2;
-    const r = 100;
-
-    const currentRecipientId = circleDetail.circle.currentRecipientId;
-    const activeContributions = circleDetail.currentCycleContributions || [];
-    const paidCount = activeContributions.filter((c: any) => c.status === "PAID").length;
-    const totalAmount = circleDetail.circle.contributionAmount * circleDetail.circle.memberCount;
-    const paidAmount = circleDetail.circle.contributionAmount * paidCount;
-    
-    const progressPercentage = (paidCount / n) * 100;
-    const circumference = 2 * Math.PI * r;
-    const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
-
-    return (
-      <div className="relative flex items-center justify-center select-none">
-        <svg width={width} height={height} className="overflow-visible">
-          <defs>
-            <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.08" />
-            </filter>
-            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FAF2E5" />
-              <stop offset="100%" stopColor="#F4D9A7" />
-            </linearGradient>
-          </defs>
-
-          <circle 
-            cx={cx} 
-            cy={cy} 
-            r={r} 
-            fill="none" 
-            stroke="rgba(28, 30, 33, 0.05)" 
-            strokeWidth="8"
-          />
-
-          <circle 
-            cx={cx} 
-            cy={cy} 
-            r={r} 
-            fill="none" 
-            stroke="var(--naira-green)" 
-            strokeWidth="8"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-            className="wheel-rotate-transition"
-            transform={`rotate(-90 ${cx} ${cy})`}
-          />
-
-          {members.map((m: any, i: number) => {
-            const nextIdx = (i + 1) % n;
-            const theta1 = (2 * Math.PI * i) / n - Math.PI / 2;
-            const theta2 = (2 * Math.PI * nextIdx) / n - Math.PI / 2;
-            
-            const x1 = cx + r * Math.cos(theta1);
-            const y1 = cy + r * Math.sin(theta1);
-            const x2 = cx + r * Math.cos(theta2);
-            const y2 = cy + r * Math.sin(theta2);
-
-            return (
-              <line
-                key={`line-${i}`}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                stroke="rgba(28, 30, 33, 0.1)"
-                strokeWidth="1.5"
-                strokeDasharray="4 4"
-              />
-            );
-          })}
-
-          {members.map((m: any, i: number) => {
-            const theta = (2 * Math.PI * i) / n - Math.PI / 2;
-            const x = cx + r * Math.cos(theta);
-            const y = cy + r * Math.sin(theta);
-            
-            const memberContribution = activeContributions.find((c: any) => c.memberId === m.id);
-            const hasPaid = memberContribution?.status === "PAID";
-            const isRecipient = m.id === currentRecipientId;
-
-            const initials = m.user.name
-              .split(" ")
-              .map((word: string) => word[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase();
-
-            return (
-              <g key={`node-${m.id}`} filter="url(#shadow)" className="cursor-pointer">
-                <circle
-                  cx={x}
-                  cy={y}
-                  r="24"
-                  fill={isRecipient ? "var(--naira-gold)" : hasPaid ? "var(--naira-green)" : "white"}
-                  stroke={isRecipient ? "white" : hasPaid ? "var(--naira-green-light)" : "rgba(28, 30, 33, 0.1)"}
-                  strokeWidth={isRecipient ? "3" : "2"}
-                />
-                
-                <text
-                  x={x}
-                  y={y + 4}
-                  textAnchor="middle"
-                  fill={isRecipient || hasPaid ? "white" : "var(--charcoal)"}
-                  className="font-display font-bold text-xs"
-                >
-                  {initials}
-                </text>
-
-                {isRecipient && (
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r="28"
-                    fill="none"
-                    stroke="var(--naira-gold)"
-                    strokeWidth="1.5"
-                    strokeDasharray="3 3"
-                    className="animate-[spin_8s_linear_infinite]"
-                  />
-                )}
-                
-                <text
-                  x={x}
-                  y={y + (y > cy ? 38 : -32)}
-                  textAnchor="middle"
-                  fill="var(--charcoal)"
-                  className="font-sans font-semibold text-[10px] bg-white px-1 py-0.5 rounded shadow-sm opacity-90"
-                >
-                  {m.user.name.split(" ")[0]}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 pointer-events-none">
-          <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-widest">Active Cycle Pot</span>
-          <div className="font-display font-extrabold text-2xl text-naira-green mt-0.5">
-            ₦{paidAmount.toLocaleString()}
-          </div>
-          <div className="h-px w-8 bg-charcoal/10 my-1"></div>
-          <span className="text-[10px] font-medium text-charcoal/60 leading-tight">
-            Target: ₦{totalAmount.toLocaleString()}
-          </span>
-          <span className="text-[10px] font-bold text-naira-green mt-1 bg-naira-green-light px-2 py-0.5 rounded-full">
-            {paidCount} of {n} Paid
-          </span>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="flex-grow flex flex-col md:flex-row min-h-screen bg-warm-linen relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -429,10 +269,7 @@ export default function DashboardPage() {
       <aside className="w-full md:w-64 border-r border-charcoal/5 flex flex-col justify-between p-6 bg-white/35 backdrop-blur-xl z-20">
         <div>
           <div className="flex items-center gap-2 mb-8 transition-transform duration-300 hover:scale-[1.02]">
-            <div className="w-8 h-8 rounded-lg bg-naira-green flex items-center justify-center text-white shadow-md shadow-naira-green/10">
-              <span className="font-display font-extrabold text-sm">₦</span>
-            </div>
-            <span className="font-display font-bold text-md text-charcoal">Ajo<span className="text-naira-green">Circles</span></span>
+            <Image src="/logo.png" alt="AjoCircles Logo" width={32} height={32} className="rounded-full" />
           </div>
 
           <div className="bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-white/50 mb-6 shadow-sm">
@@ -494,14 +331,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="mt-8 border-t border-charcoal/5 pt-4">
-            <button
-              onClick={() => router.push("/ussd-simulator")}
-              className="w-full py-2.5 px-4 rounded-xl bg-naira-green-light hover:bg-naira-green text-naira-green hover:text-white border border-naira-green/5 font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01]"
-            >
-              <Phone size={14} /> USSD Simulator
-            </button>
-          </div>
+
         </div>
 
         <button
@@ -580,7 +410,7 @@ export default function DashboardPage() {
                     {circleDetail.members.find((m: any) => m.id === circleDetail.circle.currentRecipientId)?.user.name || "None"}
                   </strong></span>
                 </div>
-                {renderPayoutWheel()}
+                <PayoutWheel circleDetail={circleDetail} />
               </div>
 
               <div className="lg:col-span-5 space-y-6">
@@ -650,21 +480,6 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                <button
-                  onClick={() => setIsCryptoOpen(true)}
-                  className="w-full p-4 rounded-2xl glass-card border border-white/50 shadow-md hover:border-naira-green/30 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 flex items-center justify-between text-left cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-naira-gold-light text-naira-gold flex items-center justify-center border border-naira-gold/10">
-                      <Wallet size={16} />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-charcoal">Pay via Stablecoin</h4>
-                      <p className="text-[10px] text-charcoal/50">Diaspora stablecoin top-up <span className="text-naira-green font-semibold">(Teaser)</span></p>
-                    </div>
-                  </div>
-                  <ArrowRight size={14} className="text-charcoal/40" />
-                </button>
               </div>
             </div>
 

@@ -13,7 +13,6 @@ The platform enables groups of people to form a "circle," contribute a fixed amo
 3. **Auto-payouts & Disbursements**: Automated disbursement of the lump sum to the current recipient once all contributions are paid.
 4. **Interactive USSD emulator**: A built-in classic feature-phone emulator in the UI that connects to the live `/api/ussd` endpoint to simulate offline dial flows (`*384*30#`).
 5. **Admin Override**: Circle creator can manually clear pending contributions for offline cash users.
-6. **Crypto afforadance teaser**: Roadmap popup outlining diasporic stablecoin transfers.
 
 ---
 
