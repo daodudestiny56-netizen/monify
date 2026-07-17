@@ -28,20 +28,40 @@ export default function LandingPage() {
     { code: "058", name: "Guaranty Trust Bank" },
     { code: "011", name: "First Bank of Nigeria" },
     { code: "033", name: "United Bank for Africa" },
-    { code: "035", name: "Wema Bank" },
-    { code: "044", name: "Access Bank" },
-    { code: "070", name: "Fidelity Bank" },
     { code: "214", name: "First City Monument Bank" },
-    { code: "030", name: "Heritage Bank" },
+    { code: "050", name: "Ecobank Nigeria" },
+    { code: "070", name: "Fidelity Bank" },
     { code: "082", name: "Keystone Bank" },
     { code: "076", name: "Polaris Bank" },
     { code: "221", name: "Stanbic IBTC Bank" },
     { code: "232", name: "Sterling Bank" },
+    { code: "030", name: "Heritage Bank" },
     { code: "100", name: "SunTrust Bank" },
     { code: "032", name: "Union Bank of Nigeria" },
     { code: "215", name: "Unity Bank" },
     { code: "015", name: "Zenith Bank" },
   ];
+
+  const [wheelOffset, setWheelOffset] = useState(289);
+  const [node1Scale, setNode1Scale] = useState(false);
+  const [node2Scale, setNode2Scale] = useState(false);
+  const [node3Scale, setNode3Scale] = useState(false);
+  const [node4Scale, setNode4Scale] = useState(false);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setWheelOffset(72.25), 300);
+    const t2 = setTimeout(() => setNode1Scale(true), 700);
+    const t3 = setTimeout(() => setNode2Scale(true), 900);
+    const t4 = setTimeout(() => setNode3Scale(true), 1100);
+    const t5 = setTimeout(() => setNode4Scale(true), 1300);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      clearTimeout(t5);
+    };
+  }, []);
 
   useEffect(() => {
     async function checkSession() {
@@ -215,7 +235,7 @@ export default function LandingPage() {
             <div className="flex-grow flex items-center justify-center py-8 relative z-10">
               <div className="w-56 h-56 relative flex items-center justify-center">
                 {/* SVG Progress Circle */}
-                <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md" viewBox="0 0 100 100">
+                <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-md transition-transform duration-[1200ms] ease-out group-hover:rotate-0" viewBox="0 0 100 100">
                   <defs>
                     <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#0D5C3A" />
@@ -239,13 +259,13 @@ export default function LandingPage() {
                     strokeWidth="4"
                     strokeLinecap="round"
                     strokeDasharray="289"
-                    strokeDashoffset="72.25"
+                    strokeDashoffset={wheelOffset}
                     className="wheel-progress-transition"
                   />
                 </svg>
                 
                 {/* Center Content */}
-                <div className="text-center z-10 px-4 flex flex-col items-center">
+                <div className="text-center z-10 px-4 flex flex-col items-center select-none">
                   <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-widest block mb-1">Total Pot</span>
                   <div className="font-display font-black text-3xl text-naira-green tracking-tight tabular-numbers drop-shadow-sm">₦40,000</div>
                   <span className="text-[11px] font-semibold text-charcoal/60 mt-2 bg-charcoal/5 px-2.5 py-1 rounded-full flex items-center gap-1.5">
@@ -255,13 +275,13 @@ export default function LandingPage() {
                 </div>
 
                 {/* Nodes - Positioned using exact percentages */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-110 transition-transform cursor-pointer">CO</div>
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-115 active:scale-95 transition-all duration-500 cursor-pointer ${node1Scale ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>CO</div>
                 
-                <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-110 transition-transform cursor-pointer">FA</div>
+                <div className={`absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-115 active:scale-95 transition-all duration-500 cursor-pointer ${node2Scale ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>FA</div>
                 
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-110 transition-transform cursor-pointer">IM</div>
+                <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gradient-to-br from-naira-green to-[#156641] text-white font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_4px_12px_rgba(13,92,58,0.3)] border-2 border-white z-20 hover:scale-115 active:scale-95 transition-all duration-500 cursor-pointer ${node3Scale ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>IM</div>
                 
-                <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-[#FFF8E7] to-[#FFE8B3] border-2 border-white text-naira-gold font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_0_20px_rgba(229,169,60,0.4)] z-20 hover:scale-110 transition-transform cursor-pointer relative animate-node-pulse">
+                <div className={`absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-br from-[#FFF8E7] to-[#FFE8B3] border-2 border-white text-naira-gold font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shadow-[0_0_20px_rgba(229,169,60,0.4)] z-20 hover:scale-115 active:scale-95 transition-all duration-500 cursor-pointer animate-node-pulse ${node4Scale ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
                   <div className="absolute inset-0 rounded-full border-2 border-naira-gold/50 animate-[ping_2s_ease-out_infinite] opacity-50 scale-150"></div>
                   <span className="relative z-10">CN</span>
                 </div>
