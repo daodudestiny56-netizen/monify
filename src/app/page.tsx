@@ -178,40 +178,49 @@ export default function LandingPage() {
 
       <main className="max-w-7xl mx-auto w-full px-6 py-12 lg:py-20 flex-grow flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
         <div className="flex-grow flex-1 max-w-xl text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-naira-green-light/80 text-naira-green font-display font-semibold text-sm mb-6 border border-naira-green/10 animate-fade-in-up shadow-sm" style={{ animationDelay: '0ms', animationFillMode: 'both' }}>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-naira-green-light/80 text-naira-green font-display font-semibold text-sm mb-6 border border-naira-green/10 animate-hero-fade shadow-sm" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
             <span className="flex h-2 w-2 rounded-full bg-naira-green animate-pulse"></span>
             Digitizing rotating savings & trust
           </div>
           
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-charcoal mb-6 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
-            Save, Rotate & Pay Out <span className="text-naira-green underline decoration-naira-gold decoration-4 underline-offset-4">With Trust</span>.
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-charcoal mb-6 animate-hero-fade" style={{ animationDelay: '250ms', animationFillMode: 'both' }}>
+            Save, Rotate & Pay Out <span className="text-naira-green">With Trust</span>.
           </h1>
           
-          <p className="text-lg text-charcoal/80 leading-relaxed mb-8 animate-fade-in-up" style={{ animationDelay: '250ms', animationFillMode: 'both' }}>
+          <p className="text-lg text-charcoal/80 leading-relaxed mb-8 animate-hero-fade" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
             Digitize your traditional rotating savings (Ajo/Esusu). Circle members contribute automatically, while payouts rotate securely via the Monnify API. Anyone can join, pay in, or monitor progress instantly using our built-in **Monnify Sandbox Core**.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-hero-fade" style={{ animationDelay: '550ms', animationFillMode: 'both' }}>
             {user ? (
               <button
                 onClick={() => router.push("/dashboard")}
-                className="w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer"
+                className="group relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-naira-green/40 active:scale-98"
               >
-                Enter Dashboard <ArrowRight size={20} />
+                <span className="absolute inset-0 block -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none z-0"></span>
+                <span className="relative z-10 flex items-center gap-2">
+                  Enter Dashboard <ArrowRight size={20} className="transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110" />
+                </span>
               </button>
             ) : (
               <>
                 <button
                   onClick={() => setAuthModal({ isOpen: true, mode: "register" })}
-                  className="w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl hover:bg-naira-green/90 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer"
+                  className="group relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-naira-green text-white font-bold rounded-xl shadow-lg shadow-naira-green/20 flex items-center justify-center gap-2 text-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-naira-green/40 active:scale-98"
                 >
-                  Create your first Circle <ArrowRight size={20} />
+                  <span className="absolute inset-0 block -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none z-0"></span>
+                  <span className="relative z-10 flex items-center gap-2">
+                    Create your first Circle <ArrowRight size={20} className="transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110" />
+                  </span>
                 </button>
                 <button
                   onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
-                  className="w-full sm:w-auto px-8 py-4 bg-white/60 backdrop-blur-md text-charcoal border border-charcoal/10 font-bold rounded-xl hover:bg-white/80 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2 text-lg cursor-pointer"
+                  className="group relative overflow-hidden w-full sm:w-auto px-8 py-4 bg-white/60 backdrop-blur-md text-charcoal border border-charcoal/10 font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 text-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:bg-white/95 hover:border-naira-green/30 hover:shadow-lg hover:shadow-charcoal/5 active:scale-98"
                 >
-                  Join existing Circle
+                  <span className="absolute inset-0 block -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-naira-green/5 to-transparent pointer-events-none z-0"></span>
+                  <span className="relative z-10 transition-colors duration-300 group-hover:text-naira-green">
+                    Join existing Circle
+                  </span>
                 </button>
               </>
             )}
@@ -309,6 +318,40 @@ export default function LandingPage() {
           </div>
         </div>
       </main>
+
+      {/* Tradition Meets Innovation Section */}
+      <section className="max-w-7xl mx-auto w-full px-6 py-16 lg:py-24 border-t border-charcoal/5 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+          {/* Image Column */}
+          <div className="w-full lg:w-1/2 flex justify-center animate-fade-in-up">
+            <div className="relative w-full max-w-[360px] aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-naira-green-light/40 to-naira-gold-light/40 border border-white p-6 shadow-xl flex items-center justify-center group hover:scale-[1.01] transition-transform duration-300">
+              <Image 
+                src="/savings-box.png" 
+                alt="Traditional Savings Box Kolo" 
+                width={300} 
+                height={300} 
+                className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2"
+              />
+            </div>
+          </div>
+
+          {/* Text Column */}
+          <div className="w-full lg:w-1/2 space-y-6 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-naira-gold-light text-naira-gold font-display font-semibold text-xs border border-naira-gold/10 shadow-sm">
+              TRADITION MEET TECHNOLOGY
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-charcoal leading-tight">
+              From the physical <span className="text-naira-green font-semibold">Kolo</span> to automated code.
+            </h2>
+            <p className="text-charcoal/80 leading-relaxed text-md">
+              For generations, rotating savings (Ajo, Esusu, Akawo) have been built on trust, using physical cash boxes or manual collectors. 
+            </p>
+            <p className="text-charcoal/70 leading-relaxed text-sm">
+              AjoCircles preserves the communal spirit of traditional groups while removing the friction of collections and physical risk. We replace manual spreadsheets and cash tracking with secure virtual accounts, automated webhook settlement, and instant payout loops.
+            </p>
+          </div>
+        </div>
+      </section>
 
       <section className="bg-[#181a1d] text-white py-20 px-6 relative z-10 border-t border-white/5 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">

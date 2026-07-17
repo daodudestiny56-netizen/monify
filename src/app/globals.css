@@ -201,3 +201,19 @@ h1, h2, h3, h4, h5, h6 {
 .animate-node-pulse {
   animation: nodePulse 2s infinite;
 }
+
+@keyframes fadeInUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-hero-fade {
+  animation: fadeInUpSmooth 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
