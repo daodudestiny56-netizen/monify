@@ -185,11 +185,6 @@ export default function UssdSimulatorPage() {
 
   return (
     <div className="flex-grow flex flex-col relative overflow-hidden bg-wave-light min-h-screen">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
-        <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
-        <div className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-terracotta/5 blur-[130px] animate-blob-3" />
-      </div>
 
       <div className="grain-overlay" />
 
