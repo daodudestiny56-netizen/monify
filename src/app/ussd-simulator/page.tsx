@@ -176,7 +176,7 @@ export default function UssdSimulatorPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-warm-linen">
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-wave-light">
         <div className="w-12 h-12 rounded-full border-4 border-naira-green border-t-transparent animate-spin"></div>
         <p className="mt-4 font-display font-medium text-charcoal">Loading USSD Gateway...</p>
       </div>
@@ -184,7 +184,7 @@ export default function UssdSimulatorPage() {
   }
 
   return (
-    <div className="flex-grow flex flex-col relative overflow-hidden bg-warm-linen min-h-screen">
+    <div className="flex-grow flex flex-col relative overflow-hidden bg-wave-light min-h-screen">
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-naira-green/5 blur-[120px] animate-blob-1" />
         <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-naira-gold/5 blur-[140px] animate-blob-2" />
